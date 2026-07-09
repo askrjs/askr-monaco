@@ -1,0 +1,82 @@
+{
+  "name": "@askrjs/monaco",
+  "version": "0.0.0",
+  "description": "Monaco editor wrapper scaffold for Askr applications",
+  "keywords": [
+    "askr",
+    "monaco",
+    "editor",
+    "wrapper",
+    "ui"
+  ],
+  "homepage": "https://github.com/askrjs/askr-monaco#readme",
+  "bugs": {
+    "url": "https://github.com/askrjs/askr-monaco/issues"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "askrjs",
+    "url": "https://github.com/askrjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/askrjs/askr-monaco.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./monaco-editor": {
+      "types": "./dist/components/monaco-editor/index.d.ts",
+      "import": "./dist/components/monaco-editor/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "clean": "npx rimraf dist node_modules",
+    "dev": "vp pack --watch",
+    "fmt": "vp fmt .",
+    "lint": "vp lint .",
+    "prepublishOnly": "npm run build",
+    "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
+    "test:browser": "vp test run --config vitest.test.browser.config.ts",
+    "test:checks": "vp test run -c vitest.test.checks.config.ts",
+    "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
+    "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts"
+  },
+  "devDependencies": {
+    "@askrjs/askr": ">=0.0.30 <0.1.0",
+    "@askrjs/vite": ">=0.0.2 <0.1.0",
+    "@types/node": "^25.9.2",
+    "axe-core": "^4.12.0",
+    "cross-env": "^10.1.0",
+    "jiti": "^2.7.0",
+    "jsdom": "^29.1.1",
+    "monaco-editor": "^0.55.1",
+    "playwright": "^1.60.0",
+    "tsd": "^0.33.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "^0.1.24",
+    "vitest-axe": "^0.1.0"
+  },
+  "peerDependencies": {
+    "@askrjs/askr": ">=0.0.30 <0.1.0",
+    "monaco-editor": "^0.55.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

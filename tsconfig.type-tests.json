@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@askrjs/askr",
+    "paths": {
+      "@askrjs/monaco": ["./src/index.ts"],
+      "@askrjs/monaco/monaco-editor": [
+        "./src/components/monaco-editor/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "tests/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "types/**/*.d.ts"
+  ]
+}
