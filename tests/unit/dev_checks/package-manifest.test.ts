@@ -31,7 +31,8 @@ describe('Package manifest checks', () => {
     expect(packageJson.peerDependencies['@askrjs/askr']).toBeTruthy();
     expect(packageJson.peerDependencies['monaco-editor']).toBeTruthy();
     expect(packageJson.devDependencies['monaco-editor']).toBeTruthy();
-    expect(packageJson.scripts.prepublishOnly).toBe('npm run build');
+    expect(packageJson.scripts.prepack).toBe('npm run build');
+    expect(packageJson.scripts.prepublishOnly).toBe('npm run check');
 
     const publicExports = Object.entries(packageJson.exports).filter(
       (entry): entry is [string, ExportTarget] =>

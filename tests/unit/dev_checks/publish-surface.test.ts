@@ -61,7 +61,12 @@ describe('Publish surface checks', () => {
     runCommand('npm', ['run', 'build']);
     packageJson = readPackageJson();
 
-    const output = runCommand('npm', ['pack', '--dry-run', '--json']);
+    const output = runCommand('npm', [
+      'pack',
+      '--ignore-scripts',
+      '--dry-run',
+      '--json',
+    ]);
     const [result] = JSON.parse(output) as PackResult[];
 
     packFilePaths = result.files.map((file) => file.path).sort();

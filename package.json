@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/monaco",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Monaco editor wrapper scaffold for Askr applications",
   "keywords": [
     "askr",
@@ -49,7 +49,12 @@
     "dev": "vp pack --watch",
     "fmt": "vp fmt .",
     "lint": "vp lint .",
-    "prepublishOnly": "npm run build",
+    "typecheck": "npm run test:types",
+    "test:publint": "publint",
+    "pack:check": "npm pack --ignore-scripts --dry-run --json",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:publint && npm run pack:check",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check",
     "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
     "test:browser": "vp test run --config vitest.test.browser.config.ts",
     "test:checks": "vp test run -c vitest.test.checks.config.ts",
@@ -58,22 +63,24 @@
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.0.30 <0.1.0",
-    "@askrjs/vite": ">=0.0.2 <0.1.0",
+    "@askrjs/askr": "file:../askr",
+    "@askrjs/vite": "file:../askr-vite",
     "@types/node": "^25.9.2",
+    "@vitest/browser-playwright": "4.1.10",
     "axe-core": "^4.12.0",
     "cross-env": "^10.1.0",
     "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "monaco-editor": "^0.55.1",
     "playwright": "^1.60.0",
+    "publint": "^0.3.21",
     "tsd": "^0.33.0",
     "typescript": "^6.0.3",
-    "vite-plus": "^0.1.24",
+    "vite-plus": "^0.2.4",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.0.30 <0.1.0",
+    "@askrjs/askr": ">=0.0.53 <0.1.0",
     "monaco-editor": "^0.55.1"
   },
   "engines": {
