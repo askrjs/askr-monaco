@@ -39,6 +39,8 @@ const expectedPackFiles = [
   'package.json',
 ].sort();
 
+const npmExecutable = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 function readPackageJson(): PackageJson {
   return JSON.parse(
     readFileSync(join(process.cwd(), 'package.json'), 'utf8')
@@ -58,10 +60,10 @@ describe('Publish surface checks', () => {
   let packFilePaths: string[];
 
   beforeAll(() => {
-    runCommand('npm', ['run', 'build']);
+    runCommand(npmExecutable, ['run', 'build']);
     packageJson = readPackageJson();
 
-    const output = runCommand('npm', [
+    const output = runCommand(npmExecutable, [
       'pack',
       '--ignore-scripts',
       '--dry-run',
