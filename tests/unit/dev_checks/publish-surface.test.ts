@@ -39,16 +39,19 @@ const expectedPackFiles = [
   'package.json',
 ].sort();
 
-const npmExecutable = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-
 function readPackageJson(): PackageJson {
   return JSON.parse(
     readFileSync(join(process.cwd(), 'package.json'), 'utf8')
   ) as PackageJson;
 }
 
-function runCommand(command: string, args: string[]) {
-  return execFileSync(command, args, {
+function runNpmCommand(args: string[]) {
+  const npmCliPath = process.env.npm_execpath;
+  if (!npmCliPath) {
+    throw new Error('npm_execpath is required to run publish surface checks');
+  }
+
+  return execFileSync(process.execPath, [npmCliPath, ...args], {
     cwd: process.cwd(),
     encoding: 'utf8',
     stdio: 'pipe',
@@ -60,10 +63,10 @@ describe('Publish surface checks', () => {
   let packFilePaths: string[];
 
   beforeAll(() => {
-    runCommand(npmExecutable, ['run', 'build']);
+    runNpmCommand(['run', 'build']);
     packageJson = readPackageJson();
 
-    const output = runCommand(npmExecutable, [
+    const output = runNpmCommand([
       'pack',
       '--ignore-scripts',
       '--dry-run',
