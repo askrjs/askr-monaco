@@ -11,4 +11,3 @@ declare module '@askrjs/askr/jsx-runtime' {
   ): JSX.Element;
   export const Fragment: unique symbol;
 }
-

@@ -4,7 +4,11 @@ import { describe, expect, it } from 'vite-plus/test';
 
 describe('Docs contract', () => {
   it('keeps the scaffold docs in place', () => {
-    for (const filename of ['README.md', 'docs/README.md', 'docs/askr-monaco.md']) {
+    for (const filename of [
+      'README.md',
+      'docs/README.md',
+      'docs/askr-monaco.md',
+    ]) {
       expect(existsSync(join(process.cwd(), filename))).toBe(true);
     }
 

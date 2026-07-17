@@ -17,10 +17,7 @@ describe('MonacoEditor - Behavior', () => {
     const loadMonaco = vi.fn(async () => fake.monaco);
 
     container = mount(
-      <MonacoEditor
-        aria-label="Monaco editor"
-        loadMonaco={loadMonaco}
-      />
+      <MonacoEditor aria-label="Monaco editor" loadMonaco={loadMonaco} />
     );
 
     await flushUpdates();

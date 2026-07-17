@@ -33,9 +33,7 @@ type MonacoController = {
   lastHostRef: Ref<HTMLDivElement>;
   lastEditorRef: Ref<MonacoEditorInstance>;
   lastMonacoRef: Ref<MonacoNamespace>;
-  lastOverrideServices:
-    | MonacoEditorProps['overrideServices']
-    | undefined;
+  lastOverrideServices: MonacoEditorProps['overrideServices'] | undefined;
   lastOverflowWidgetsDomNode: HTMLElement | undefined;
   lastAriaContainerElement: HTMLElement | undefined;
   lastOptions: MonacoEditorOptions | undefined;
@@ -218,7 +216,8 @@ function resolveModel(
   controller: MonacoController,
   monaco: MonacoNamespace
 ): MonacoTextModel | null {
-  const { model, value, defaultValue, language, path } = controller.currentProps;
+  const { model, value, defaultValue, language, path } =
+    controller.currentProps;
 
   if (model !== undefined) {
     disposeOwnedModel(controller);
@@ -226,11 +225,7 @@ function resolveModel(
   }
 
   if (controller.ownedModel === null) {
-    return createOwnedModel(
-      controller,
-      monaco,
-      value ?? defaultValue ?? ''
-    );
+    return createOwnedModel(controller, monaco, value ?? defaultValue ?? '');
   }
 
   const nextPath = normalizePath(path);
@@ -365,10 +360,8 @@ function disposeEditor(
 
 function needsEditorRecreate(controller: MonacoController) {
   const { options, overrideServices } = controller.currentProps;
-  const {
-    overflowWidgetsDomNode,
-    ariaContainerElement,
-  } = getCreateOnlyNodes(options);
+  const { overflowWidgetsDomNode, ariaContainerElement } =
+    getCreateOnlyNodes(options);
 
   return (
     controller.editor === null ||
@@ -452,7 +445,10 @@ function applyEditorUpdates(
   }
 }
 
-function startLoadingMonaco(controller: MonacoController, loader: MonacoLoader) {
+function startLoadingMonaco(
+  controller: MonacoController,
+  loader: MonacoLoader
+) {
   const load = loader ?? defaultLoadMonaco;
 
   if (controller.loadingPromise && controller.loadingLoader === load) {
@@ -566,8 +562,7 @@ export function MonacoEditor(props: MonacoEditorProps): JSX.Element {
   scheduleApply(controller);
 
   const hasAccessibleLabel =
-    typeof props['aria-label'] === 'string' ||
-    props['aria-labelledby'] != null;
+    typeof props['aria-label'] === 'string' || props['aria-labelledby'] != null;
 
   const {
     beforeMount: _beforeMount,

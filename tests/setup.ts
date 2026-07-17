@@ -8,4 +8,3 @@ if (typeof HTMLCanvasElement !== 'undefined') {
 }
 
 export {};
-

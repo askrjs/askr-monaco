@@ -16,8 +16,9 @@ describe('Source layout', () => {
     expect(readComponentDirectories()).toEqual(['monaco-editor']);
 
     expect(
-      existsSync(join(process.cwd(), 'src', 'components', 'monaco-editor', 'index.ts'))
+      existsSync(
+        join(process.cwd(), 'src', 'components', 'monaco-editor', 'index.ts')
+      )
     ).toBe(true);
   });
 });
-

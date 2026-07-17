@@ -13,10 +13,5 @@
       ]
     }
   },
-  "include": [
-    "tests/**/*",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "types/**/*.d.ts"
-  ]
+  "include": ["tests/**/*", "src/**/*.ts", "src/**/*.tsx", "types/**/*.d.ts"]
 }

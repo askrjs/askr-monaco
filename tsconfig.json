@@ -8,10 +8,5 @@
     "outDir": "./dist",
     "rootDir": "."
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "types/**/*.d.ts"
-  ]
+  "include": ["src/**/*", "tests/**/*", "types/**/*.d.ts"]
 }
-

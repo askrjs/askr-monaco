@@ -4,10 +4,10 @@
   "description": "Monaco editor wrapper scaffold for Askr applications",
   "keywords": [
     "askr",
-    "monaco",
     "editor",
-    "wrapper",
-    "ui"
+    "monaco",
+    "ui",
+    "wrapper"
   ],
   "homepage": "https://github.com/askrjs/askr-monaco#readme",
   "bugs": {
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/askrjs/askr-monaco.git"
+    "url": "git+https://github.com/askrjs/askr-monaco.git"
   },
   "files": [
     "dist"

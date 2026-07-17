@@ -1,9 +1,7 @@
 import axe from 'axe-core';
 import { mount, unmount } from '../test-utils';
 
-export async function expectNoAxeViolations(
-  target: JSX.Element | HTMLElement
-) {
+export async function expectNoAxeViolations(target: JSX.Element | HTMLElement) {
   const container = target instanceof HTMLElement ? target : mount(target);
 
   try {
@@ -20,4 +18,3 @@ export async function expectNoAxeViolations(
     unmount(container);
   }
 }
-

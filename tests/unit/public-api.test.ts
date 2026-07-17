@@ -7,4 +7,3 @@ describe('Public API', () => {
     expect(askrMonaco.MonacoEditor).toEqual(expect.any(Function));
   });
 });
-

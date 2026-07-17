@@ -9,4 +9,3 @@ export default defineConfig({
     include: ['tests/jsdom/components/**/*.test.tsx'],
   },
 });
-

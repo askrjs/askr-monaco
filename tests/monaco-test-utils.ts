@@ -70,7 +70,8 @@ function createEditor(model: Monaco.editor.ITextModel | null) {
       editor.setModelCalls.push(nextModel);
     },
     updateOptions: (
-      nextOptions: Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions
+      nextOptions: Monaco.editor.IEditorOptions &
+        Monaco.editor.IGlobalEditorOptions
     ) => {
       editor.updateOptionsCalls.push(nextOptions);
     },
@@ -114,11 +115,7 @@ export function createFakeMonaco() {
         editors.push(editor);
         return editor as Monaco.editor.IStandaloneCodeEditor;
       },
-      createModel: (
-        value: string,
-        language?: string,
-        uri?: Monaco.Uri
-      ) => {
+      createModel: (value: string, language?: string, uri?: Monaco.Uri) => {
         const uriText = uri?.toString() ?? `inmemory://model/${++modelIndex}`;
         const model = createTextModel(value, language, uriText, () => {
           modelsByUri.delete(uriText);

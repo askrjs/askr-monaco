@@ -34,4 +34,3 @@ export function unmount(container: HTMLElement | undefined) {
 
   resetTestState();
 }
-

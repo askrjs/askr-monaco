@@ -1,5 +1,9 @@
 import { state } from '@askrjs/askr';
-import type { MonacoEditorProps, MonacoEditorInstance, MonacoNamespace } from '../../../../src';
+import type {
+  MonacoEditorProps,
+  MonacoEditorInstance,
+  MonacoNamespace,
+} from '../../../../src';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { MonacoEditor } from '../../../../src';
 import { createFakeMonaco } from '../../../monaco-test-utils';
@@ -83,7 +87,9 @@ describe('MonacoEditor - jsdom', () => {
       language: 'typescript',
       path: 'file:///src/start.ts',
     };
-    let setProps!: (updater: (prev: MonacoEditorProps) => MonacoEditorProps) => void;
+    let setProps!: (
+      updater: (prev: MonacoEditorProps) => MonacoEditorProps
+    ) => void;
 
     function Harness() {
       const propsState = state<MonacoEditorProps>(initialProps);
@@ -140,7 +146,9 @@ describe('MonacoEditor - jsdom', () => {
       fake.monaco.Uri.parse('file:///src/second.ts')
     );
     const onUnmount = vi.fn();
-    let setProps!: (updater: (prev: MonacoEditorProps) => MonacoEditorProps) => void;
+    let setProps!: (
+      updater: (prev: MonacoEditorProps) => MonacoEditorProps
+    ) => void;
 
     function Harness() {
       const propsState = state<MonacoEditorProps>({
@@ -169,14 +177,26 @@ describe('MonacoEditor - jsdom', () => {
     await flushUpdates();
 
     expect(fake.editors[0].setModelCalls).toEqual([externalSecond]);
-    expect((externalFirst as ReturnType<typeof createFakeMonaco>['createdModels'][number]).disposeCalls).toBe(0);
+    expect(
+      (
+        externalFirst as ReturnType<
+          typeof createFakeMonaco
+        >['createdModels'][number]
+      ).disposeCalls
+    ).toBe(0);
 
     unmount(container);
     container = undefined;
 
     expect(fake.editors[0].disposed).toBe(true);
     expect(onUnmount).toHaveBeenCalledWith(fake.editors[0], fake.monaco);
-    expect((externalSecond as ReturnType<typeof createFakeMonaco>['createdModels'][number]).disposeCalls).toBe(0);
+    expect(
+      (
+        externalSecond as ReturnType<
+          typeof createFakeMonaco
+        >['createdModels'][number]
+      ).disposeCalls
+    ).toBe(0);
 
     const internal = createFakeMonaco();
     const internalContainer = mount(
@@ -257,7 +277,9 @@ describe('MonacoEditor - jsdom', () => {
     const second = createFakeMonaco();
     const loadMonaco = vi.fn(async () => second.monaco);
     const monacoRef = { current: null as MonacoNamespace | null };
-    let setProps!: (updater: (prev: MonacoEditorProps) => MonacoEditorProps) => void;
+    let setProps!: (
+      updater: (prev: MonacoEditorProps) => MonacoEditorProps
+    ) => void;
 
     function Harness() {
       const propsState = state<MonacoEditorProps>({

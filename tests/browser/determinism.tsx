@@ -22,4 +22,3 @@ export function expectDeterministicRender(factory: () => JSX.Element) {
 
   expect(first).toBe(second);
 }
-
