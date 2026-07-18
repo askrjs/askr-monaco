@@ -4,10 +4,10 @@ import { neverLoadMonaco } from '../../../monaco-test-utils';
 import { expectDeterministicRender } from '../../../browser/determinism';
 
 describe('MonacoEditor - Determinism', () => {
-  it('renders stable placeholder markup', () => {
+  it('renders stable host markup', () => {
     expectDeterministicRender(() => (
       <MonacoEditor
-        aria-label="Monaco editor placeholder"
+        aria-label="Monaco editor host"
         loadMonaco={neverLoadMonaco}
       />
     ));

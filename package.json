@@ -1,7 +1,7 @@
 {
   "name": "@askrjs/monaco",
   "version": "0.0.2",
-  "description": "Monaco editor wrapper scaffold for Askr applications",
+  "description": "Thin Monaco editor wrapper for Askr applications",
   "keywords": [
     "askr",
     "editor",
@@ -68,16 +68,12 @@
     "@types/node": "^25.9.2",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "^4.12.0",
-    "cross-env": "^10.1.0",
-    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "monaco-editor": "^0.55.1",
     "playwright": "^1.60.0",
     "publint": "^0.3.21",
-    "tsd": "^0.33.0",
     "typescript": "^6.0.3",
-    "vite-plus": "^0.2.4",
-    "vitest-axe": "^0.1.0"
+    "vite-plus": "^0.2.4"
   },
   "peerDependencies": {
     "@askrjs/askr": ">=0.0.52 <0.1.0",

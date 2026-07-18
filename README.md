@@ -40,7 +40,7 @@ const model = monaco.editor.createModel(
 
 ## Status
 
-- Root package and direct subpath exports are scaffolded.
+- Root package and direct subpath exports expose the thin wrapper.
 - `MonacoEditor` lazy-loads Monaco by default or accepts an injected namespace.
 - Wrapper-owned concerns are host lifecycle, model wiring, and typed escape hatches.
 - Wrapper-owned `path` values must be unique; pass an existing Monaco model
