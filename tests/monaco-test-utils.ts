@@ -14,6 +14,7 @@ export type FakeEditor = Monaco.editor.IStandaloneCodeEditor & {
     Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions
   >;
   layoutCalls: Array<Monaco.editor.IDimension | undefined>;
+  emitModelContentChange: (value: string) => void;
 };
 
 export type FakeCreateCall = {
@@ -56,6 +57,9 @@ function createTextModel(
 }
 
 function createEditor(model: Monaco.editor.ITextModel | null) {
+  const contentChangeListeners = new Set<
+    (event: Monaco.editor.IModelContentChangedEvent) => void
+  >();
   const editor = {
     disposed: false,
     disposeCalls: 0,
@@ -82,9 +86,26 @@ function createEditor(model: Monaco.editor.ITextModel | null) {
     setValue: (nextValue: string) => {
       currentModel?.setValue(nextValue);
     },
+    onDidChangeModelContent: (
+      listener: (event: Monaco.editor.IModelContentChangedEvent) => void
+    ) => {
+      contentChangeListeners.add(listener);
+      return {
+        dispose: () => contentChangeListeners.delete(listener),
+      };
+    },
+    emitModelContentChange: (nextValue: string) => {
+      currentModel?.setValue(nextValue);
+      const event = {} as Monaco.editor.IModelContentChangedEvent;
+
+      for (const listener of contentChangeListeners) {
+        listener(event);
+      }
+    },
     dispose: () => {
       editor.disposed = true;
       editor.disposeCalls += 1;
+      contentChangeListeners.clear();
     },
   } as unknown as FakeEditor;
 
