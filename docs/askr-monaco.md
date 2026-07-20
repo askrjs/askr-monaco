@@ -6,6 +6,10 @@ It publishes a thin `MonacoEditor` host that forwards real Monaco models,
 options, lifecycle hooks, and imperative escape hatches instead of recreating
 Monaco's API in wrapper-specific props.
 
+Controlled value updates preserve Monaco's editor instance and its
+imperatively managed DOM. Updating parent Askr state from
+`onDidChangeModelContent` does not require remounting the wrapper.
+
 ## Published surface
 
 - `@askrjs/monaco`

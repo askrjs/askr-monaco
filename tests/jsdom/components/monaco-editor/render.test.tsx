@@ -133,6 +133,145 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.editors[0].getModel()?.getLanguageId()).toBe('javascript');
   });
 
+  it('keeps the editor mounted when its change event updates controlled parent state', async () => {
+    const fake = createFakeMonaco();
+
+    function Harness() {
+      const value = state('SELECT 1;');
+
+      return (
+        <MonacoEditor
+          aria-label="SQL editor"
+          language="sql"
+          monaco={fake.monaco}
+          onMount={(editor) => {
+            editor.onDidChangeModelContent(() => {
+              value.set(editor.getValue());
+            });
+          }}
+          options={{ automaticLayout: true }}
+          value={value()}
+        />
+      );
+    }
+
+    container = mount(<Harness />);
+
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    const host = container.querySelector('[data-askr-monaco-editor]');
+    const editor = fake.editors[0];
+    const model = fake.createdModels[0];
+    const imperativeChild = document.createElement('div');
+    imperativeChild.dataset.monacoView = 'true';
+    host?.appendChild(imperativeChild);
+
+    editor.emitModelContentChange('SELECT 12;');
+
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(host?.isConnected).toBe(true);
+    expect(container.querySelector('[data-askr-monaco-editor]')).toBe(host);
+    expect(host?.contains(imperativeChild)).toBe(true);
+    expect(fake.createCalls).toHaveLength(1);
+    expect(editor.disposed).toBe(false);
+    expect(model.disposed).toBe(false);
+    expect(editor.getValue()).toBe('SELECT 12;');
+  });
+
+  it('preserves Monaco DOM across rapid updates and controlled normalization', async () => {
+    const fake = createFakeMonaco();
+
+    function Harness() {
+      const value = state('SELECT 1;');
+      const revision = state(0);
+
+      return (
+        <MonacoEditor
+          aria-label="SQL editor"
+          data-revision={revision()}
+          monaco={fake.monaco}
+          onMount={(editor) => {
+            editor.onDidChangeModelContent(() => {
+              value.set(editor.getValue().trim());
+              revision.set((current) => current + 1);
+            });
+          }}
+          value={value()}
+        />
+      );
+    }
+
+    container = mount(<Harness />);
+
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    const host = container.querySelector('[data-askr-monaco-editor]');
+    const imperativeChild = document.createElement('div');
+    host?.appendChild(imperativeChild);
+
+    fake.editors[0].emitModelContentChange(' SELECT 2; ');
+    fake.editors[0].emitModelContentChange(' SELECT 3; ');
+
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(host?.contains(imperativeChild)).toBe(true);
+    expect(host?.querySelectorAll('div')).toHaveLength(1);
+    expect(host?.getAttribute('data-revision')).toBe('2');
+    expect(fake.createCalls).toHaveLength(1);
+    expect(fake.editors[0].getValue()).toBe('SELECT 3;');
+  });
+
+  it('still disposes Monaco exactly once after an update and real unmount', async () => {
+    const fake = createFakeMonaco();
+
+    function Harness() {
+      const value = state('SELECT 1;');
+
+      return (
+        <MonacoEditor
+          aria-label="SQL editor"
+          monaco={fake.monaco}
+          onMount={(editor) => {
+            editor.onDidChangeModelContent(() => {
+              value.set(editor.getValue());
+            });
+          }}
+          value={value()}
+        />
+      );
+    }
+
+    container = mount(<Harness />);
+
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    const host = container.querySelector('[data-askr-monaco-editor]');
+    const imperativeChild = document.createElement('div');
+    host?.appendChild(imperativeChild);
+
+    fake.editors[0].emitModelContentChange('SELECT 2;');
+    unmount(container);
+    container = undefined;
+
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(host?.isConnected).toBe(false);
+    expect(fake.editors[0].disposeCalls).toBe(1);
+    expect(fake.createdModels[0].disposeCalls).toBe(1);
+  });
+
   it('keeps external models owned by the caller and disposes internal ones', async () => {
     const fake = createFakeMonaco();
     const externalFirst = fake.monaco.editor.createModel(

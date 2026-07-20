@@ -1,6 +1,6 @@
 # Agent Guidance for askr-monaco
 
-This repo is the scaffold for an Askr wrapper around Monaco Editor.
+This repo owns the thin Askr host wrapper around Monaco Editor.
 
 - Keep the surface small until the first real Monaco integration lands.
 - Mirror the askr-ui package layout when adding source, tests, and docs.

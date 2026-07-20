@@ -38,6 +38,9 @@ type MonacoController = {
   lastAriaContainerElement: HTMLElement | undefined;
   lastOptions: MonacoEditorOptions | undefined;
   lastTheme: string | undefined;
+  detachedChildren: DocumentFragment | null;
+  detachedHost: HTMLDivElement | null;
+  restoreScheduled: boolean;
 };
 
 function defaultLoadMonaco() {
@@ -81,9 +84,63 @@ function createController(initialProps: MonacoEditorProps): MonacoController {
     lastAriaContainerElement: undefined,
     lastOptions: undefined,
     lastTheme: undefined,
+    detachedChildren: null,
+    detachedHost: null,
+    restoreScheduled: false,
   };
 
   return controller;
+}
+
+function preserveImperativeChildren(controller: MonacoController) {
+  const host = controller.host;
+
+  if (
+    controller.disposed ||
+    controller.editor === null ||
+    host === null ||
+    controller.detachedChildren !== null ||
+    !host.firstChild
+  ) {
+    return;
+  }
+
+  const detachedChildren = document.createDocumentFragment();
+  while (host.firstChild) {
+    detachedChildren.appendChild(host.firstChild);
+  }
+  controller.detachedChildren = detachedChildren;
+  controller.detachedHost = host;
+
+  if (controller.restoreScheduled) {
+    return;
+  }
+
+  controller.restoreScheduled = true;
+  queueMicrotask(() => {
+    controller.restoreScheduled = false;
+    const pendingChildren = controller.detachedChildren;
+    const pendingHost = controller.detachedHost;
+    controller.detachedChildren = null;
+    controller.detachedHost = null;
+
+    if (
+      pendingChildren &&
+      pendingHost &&
+      !controller.disposed &&
+      controller.editor !== null &&
+      controller.host === pendingHost &&
+      pendingHost.isConnected
+    ) {
+      pendingHost.append(pendingChildren);
+    }
+  });
+}
+
+function discardDetachedChildren(controller: MonacoController) {
+  controller.detachedChildren?.replaceChildren();
+  controller.detachedChildren = null;
+  controller.detachedHost = null;
 }
 
 function scheduleApply(controller: MonacoController) {
@@ -335,6 +392,8 @@ function disposeEditor(
   clearMonaco: boolean,
   preserveOwnedModel = false
 ) {
+  discardDetachedChildren(controller);
+
   if (controller.editor !== null) {
     runMountHandler(controller.currentProps.onUnmount, controller);
     controller.editor.dispose();
@@ -559,6 +618,10 @@ export function MonacoEditor(props: MonacoEditorProps): JSX.Element {
     };
   });
 
+  // Askr reconciles an intrinsic host's declared children on parent updates.
+  // Monaco owns this host's children imperatively, so keep them out of that
+  // reconciliation pass and restore the same nodes immediately afterward.
+  preserveImperativeChildren(controller);
   scheduleApply(controller);
 
   const hasAccessibleLabel =

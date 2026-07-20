@@ -14,6 +14,34 @@ permissions:
   contents: read
 
 jobs:
+  askr-peer:
+    name: Askr peer (${{ matrix.askr-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        askr-version: ['0.0.52', latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Select Askr peer version
+        run: npm install --no-save @askrjs/askr@${{ matrix.askr-version }}
+
+      - name: Test Monaco lifecycle compatibility
+        run: npm run test:jsdom
+
   ci:
     name: CI (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
