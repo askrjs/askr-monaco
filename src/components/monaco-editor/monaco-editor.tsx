@@ -106,7 +106,9 @@ function preserveImperativeChildren(controller: MonacoController) {
   }
 
   const detachedChildren = document.createDocumentFragment();
-  detachedChildren.append(...host.childNodes);
+  while (host.firstChild) {
+    detachedChildren.appendChild(host.firstChild);
+  }
   controller.detachedChildren = detachedChildren;
   controller.detachedHost = host;
 
