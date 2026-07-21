@@ -1,5 +1,8 @@
 # @askrjs/monaco
 
+[![CI](https://github.com/askrjs/askr-monaco/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/askrjs/askr-monaco/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/%40askrjs%2Fmonaco.svg)](https://www.npmjs.com/package/@askrjs/monaco)
+
 ESM-only Askr wrapper for Monaco Editor.
 
 This package keeps the wrapper thin on purpose: it hosts Monaco inside an Askr
