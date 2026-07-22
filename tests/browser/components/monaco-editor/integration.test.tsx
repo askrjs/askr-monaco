@@ -18,9 +18,7 @@ describe('MonacoEditor - real Monaco integration', () => {
 
     function Harness() {
       const value = state(
-        Array.from({ length: 80 }, (_, index) => `line ${index + 1}`).join(
-          '\n'
-        )
+        Array.from({ length: 80 }, (_, index) => `line ${index + 1}`).join('\n')
       );
 
       return (
@@ -82,9 +80,7 @@ describe('MonacoEditor - real Monaco integration', () => {
 
     function Harness() {
       const value = state(
-        Array.from({ length: 80 }, (_, index) => `line ${index + 1}`).join(
-          '\n'
-        )
+        Array.from({ length: 80 }, (_, index) => `line ${index + 1}`).join('\n')
       );
       updateValue = value.set;
 
