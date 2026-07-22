@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        askr-version: ['0.0.52', latest]
+        askr-version: ['0.0.62', latest]
 
     steps:
       - name: Checkout repository
