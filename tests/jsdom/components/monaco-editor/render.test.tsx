@@ -167,6 +167,8 @@ describe('MonacoEditor - jsdom', () => {
     const imperativeChild = document.createElement('div');
     imperativeChild.dataset.monacoView = 'true';
     host?.appendChild(imperativeChild);
+    imperativeChild.tabIndex = 0;
+    imperativeChild.focus();
 
     editor.emitModelContentChange('SELECT 12;');
 
@@ -177,6 +179,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(host?.isConnected).toBe(true);
     expect(container.querySelector('[data-askr-monaco-editor]')).toBe(host);
     expect(host?.contains(imperativeChild)).toBe(true);
+    expect(document.activeElement).toBe(imperativeChild);
     expect(fake.createCalls).toHaveLength(1);
     expect(editor.disposed).toBe(false);
     expect(model.disposed).toBe(false);
