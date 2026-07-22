@@ -83,6 +83,8 @@ function createEditor(model: Monaco.editor.ITextModel | null) {
       editor.layoutCalls.push(dimension);
     },
     getValue: () => currentModel?.getValue() ?? '',
+    saveViewState: () => ({ cursorState: [], viewState: {} }),
+    restoreViewState: () => undefined,
     setValue: (nextValue: string) => {
       currentModel?.setValue(nextValue);
     },
