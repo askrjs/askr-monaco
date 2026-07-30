@@ -65,11 +65,11 @@ jobs:
         run: npm ci
 
       - name: Install browser engines with Linux dependencies
-        if: ${{ hashFiles('vitest.test.browser.config.ts', 'playwright.config.*') != '' && runner.os == 'Linux' }}
+        if: ${{ runner.os == 'Linux' }}
         run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Install browser engines
-        if: ${{ hashFiles('vitest.test.browser.config.ts', 'playwright.config.*') != '' && runner.os != 'Linux' }}
+        if: ${{ runner.os != 'Linux' }}
         run: npx playwright install chromium firefox webkit
 
       - name: Format check
