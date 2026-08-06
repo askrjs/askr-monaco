@@ -33,6 +33,7 @@ export type MonacoEditorProps = Omit<
 > & {
   ref?: Ref<HTMLDivElement>;
   children?: never;
+  role?: JSX.IntrinsicElements['div']['role'];
   options?: MonacoEditorOptions;
   overrideServices?: Monaco.editor.IEditorOverrideServices;
   model?: MonacoTextModel | null;
