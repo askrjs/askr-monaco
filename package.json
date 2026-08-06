@@ -72,7 +72,7 @@
     "monaco-editor": "^0.56.0",
     "playwright": "^1.60.0",
     "publint": "^0.3.21",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vite-plus": "^0.2.4"
   },
   "peerDependencies": {
