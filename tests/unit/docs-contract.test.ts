@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 describe('Docs contract', () => {
-  it('keeps the wrapper docs in place', () => {
+  it('should keep the wrapper docs in place', () => {
     for (const filename of [
       'README.md',
       'docs/README.md',

@@ -8,7 +8,7 @@ type ExportTarget = {
 };
 
 describe('Package manifest checks', () => {
-  it('keeps the wrapper package metadata aligned', () => {
+  it('should keep the wrapper package metadata aligned', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8')
     ) as {

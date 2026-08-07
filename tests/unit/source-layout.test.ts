@@ -12,7 +12,7 @@ function readComponentDirectories() {
 }
 
 describe('Source layout', () => {
-  it('keeps the component tree flat and one folder per public component', () => {
+  it('should keep the component tree flat and one folder per public component', () => {
     expect(readComponentDirectories()).toEqual(['monaco-editor']);
 
     expect(

@@ -81,11 +81,11 @@ describe('Publish surface checks', () => {
     packFilePaths = result.files.map((file) => file.path).sort();
   });
 
-  it('packs the curated ESM release surface only', () => {
+  it('should pack the curated ESM release surface only', () => {
     expect(packFilePaths).toEqual(expectedPackFiles);
   });
 
-  it('includes every advertised public export target in the tarball', () => {
+  it('should include every advertised public export target in the tarball', () => {
     for (const [subpath, target] of Object.entries(packageJson.exports)) {
       if (subpath === './package.json' || typeof target === 'string') {
         continue;
@@ -102,7 +102,7 @@ describe('Publish surface checks', () => {
     );
   });
 
-  it('emits importable ESM modules for every public entrypoint', async () => {
+  it('should emit importable ESM modules for every public entrypoint', async () => {
     const publicExports = Object.entries(packageJson.exports).filter(
       (entry): entry is [string, ExportTarget] =>
         entry[0] !== './package.json' && typeof entry[1] !== 'string'

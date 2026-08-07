@@ -13,7 +13,7 @@ describe('MonacoEditor - Behavior', () => {
     container = undefined;
   });
 
-  it('loads Monaco lazily and creates the editor host once ready', async () => {
+  it('should load Monaco lazily and create the editor host once ready', async () => {
     const fake = createFakeMonaco();
     const loadMonaco = vi.fn(async () => fake.monaco);
 
@@ -30,7 +30,7 @@ describe('MonacoEditor - Behavior', () => {
     expect(fake.createCalls).toHaveLength(1);
   });
 
-  it('preserves focus when a model change updates controlled parent state', async () => {
+  it('should preserve focus when a model change updates controlled parent state', async () => {
     const fake = createFakeMonaco();
 
     function Harness() {
