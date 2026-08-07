@@ -44,6 +44,8 @@ const model = monaco.editor.createModel(
 ## Status
 
 - Root package and direct subpath exports expose the thin wrapper.
+- `@askrjs/monaco/testing` exposes deterministic model-editing helpers for
+  browser tests without pretending that touch devices have a keyboard modifier.
 - `MonacoEditor` lazy-loads Monaco by default or accepts an injected namespace.
 - Wrapper-owned concerns are host lifecycle, model wiring, and typed escape hatches.
 - Wrapper-owned `path` values must be unique; pass an existing Monaco model
@@ -59,3 +61,5 @@ const model = monaco.editor.createModel(
 
 - [Docs index](./docs/README.md)
 - [Package overview](./docs/askr-monaco.md)
+- [Testing editor interactions](./docs/testing.md)
+- [Vite and Rolldown lazy workers](./docs/vite-lazy-workers.md)

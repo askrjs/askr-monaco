@@ -1,7 +1,7 @@
 import type { Ref } from '@askrjs/askr/foundations/utilities';
 import type * as Monaco from 'monaco-editor';
 
-export type MonacoNamespace = typeof import('monaco-editor');
+export type MonacoNamespace = typeof import('monaco-editor/editor/editor.api');
 export type MonacoEditorInstance = Monaco.editor.IStandaloneCodeEditor;
 export type MonacoTextModel = Monaco.editor.ITextModel;
 export type MonacoUri = Monaco.Uri;

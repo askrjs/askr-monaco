@@ -38,6 +38,10 @@
       "types": "./dist/components/monaco-editor/index.d.ts",
       "import": "./dist/components/monaco-editor/index.js"
     },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -63,9 +67,9 @@
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.0.87 <0.1.0",
+    "@askrjs/askr": ">=0.0.88 <0.1.0",
     "@askrjs/vite": ">=0.0.12 <0.1.0",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "^4.13.0",
     "jsdom": "^30.0.1",
@@ -76,11 +80,11 @@
     "vite-plus": "^0.2.8"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.0.87 <0.1.0",
+    "@askrjs/askr": ">=0.0.88 <0.1.0",
     "monaco-editor": "^0.56.0"
   },
   "overrides": {
-    "dompurify": "3.4.12"
+    "dompurify": "3.4.13"
   },
   "engines": {
     "node": ">=24.0.0"

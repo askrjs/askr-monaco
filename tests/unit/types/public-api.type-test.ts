@@ -7,6 +7,10 @@ import type {
   MonacoNamespace,
 } from '../../../src';
 import { MonacoEditor as MonacoEditorSubpath } from '@askrjs/monaco/monaco-editor';
+import {
+  createMonacoEditorTestDriver,
+  type MonacoEditorTestDriver,
+} from '@askrjs/monaco/testing';
 
 const options: MonacoEditorOptions = {
   automaticLayout: true,
@@ -45,4 +49,9 @@ void props;
 void controlledProps;
 void MonacoEditor;
 void MonacoEditorSubpath;
+const testDriver = createMonacoEditorTestDriver(
+  null as unknown as MonacoEditorInstance
+);
+const typedTestDriver: MonacoEditorTestDriver = testDriver;
+void typedTestDriver;
 void invalidOptions;
