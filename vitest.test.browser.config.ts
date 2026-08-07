@@ -1,5 +1,6 @@
 import { playwright } from 'vite-plus/test/browser-playwright';
 import { defineConfig } from 'vite-plus';
+import { devices } from 'playwright';
 import { sharedVitestConfig } from './vitest.test.shared';
 
 export default defineConfig({
@@ -11,7 +12,14 @@ export default defineConfig({
       headless: true,
       provider: playwright(),
       instances: [
-        { browser: 'chromium' },
+        { browser: 'chromium', name: 'chromium-desktop' },
+        {
+          browser: 'chromium',
+          name: 'chromium-pixel-7',
+          provider: playwright({
+            contextOptions: { ...devices['Pixel 7'] },
+          }),
+        },
         { browser: 'firefox' },
         { browser: 'webkit' },
       ],

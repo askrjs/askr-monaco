@@ -14,6 +14,7 @@ imperatively managed DOM. Updating parent Askr state from
 
 - `@askrjs/monaco`
 - `@askrjs/monaco/monaco-editor`
+- `@askrjs/monaco/testing`
 
 ## Install
 
@@ -49,3 +50,7 @@ const model = monaco.editor.createModel(
   resolve it with `monaco.editor.getModel(uri)` and pass it explicitly through
   `model`.
 - `beforeMount`, `onMount`, `onUnmount`, `editorRef`, and `monacoRef` expose the underlying Monaco lifecycle directly.
+
+For deterministic editor tests and production worker loading, see
+[Testing editor interactions](./testing.md) and
+[Vite and Rolldown lazy workers](./vite-lazy-workers.md).

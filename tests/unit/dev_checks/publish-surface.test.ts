@@ -36,6 +36,10 @@ const expectedPackFiles = [
   'dist/components/monaco-editor/monaco-editor.types.d.ts.map',
   'dist/index.d.ts',
   'dist/index.js',
+  'dist/testing/index.d.ts',
+  'dist/testing/index.d.ts.map',
+  'dist/testing/index.js',
+  'dist/testing/index.js.map',
   'package.json',
 ].sort();
 

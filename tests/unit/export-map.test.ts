@@ -14,7 +14,7 @@ function readPackageJson(): { exports: Record<string, ExportTarget | string> } {
 }
 
 describe('Package exports', () => {
-  it('publishes the root and monaco-editor entrypoints only', () => {
+  it('should publish the root, editor, and testing entrypoints', () => {
     const packageJson = readPackageJson();
 
     expect(packageJson.exports['.']).toEqual({
@@ -25,6 +25,11 @@ describe('Package exports', () => {
     expect(packageJson.exports['./monaco-editor']).toEqual({
       types: './dist/components/monaco-editor/index.d.ts',
       import: './dist/components/monaco-editor/index.js',
+    });
+
+    expect(packageJson.exports['./testing']).toEqual({
+      types: './dist/testing/index.d.ts',
+      import: './dist/testing/index.js',
     });
 
     expect(packageJson.exports['./package.json']).toBe('./package.json');

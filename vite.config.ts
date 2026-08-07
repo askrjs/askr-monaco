@@ -15,10 +15,17 @@ function createPackageEntries() {
           return ['index', resolve(srcRoot, 'index.ts')];
         }
 
-        const componentName = subpath.slice(2);
+        const entryName = subpath.slice(2);
+        const entryPath =
+          entryName === 'monaco-editor'
+            ? resolve(srcRoot, 'components', entryName, 'index.ts')
+            : resolve(srcRoot, entryName, 'index.ts');
+
         return [
-          `components/${componentName}/index`,
-          resolve(srcRoot, 'components', componentName, 'index.ts'),
+          entryName === 'monaco-editor'
+            ? `components/${entryName}/index`
+            : `${entryName}/index`,
+          entryPath,
         ];
       })
   );
