@@ -4,7 +4,7 @@ import { createFakeMonaco } from '../../../monaco-test-utils';
 import { expectNoAxeViolations } from '../../../browser/accessibility';
 
 describe('MonacoEditor - Accessibility', () => {
-  it('has no automated axe violations for the editor host', async () => {
+  it('should have no automated axe violations for the editor host', async () => {
     const fake = createFakeMonaco();
 
     await expectNoAxeViolations(

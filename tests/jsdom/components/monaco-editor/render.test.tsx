@@ -35,7 +35,7 @@ describe('MonacoEditor - jsdom', () => {
     extraContainers = extraContainers.filter((item) => item !== current);
   }
 
-  it('creates a Monaco editor with raw options and lifecycle hooks', async () => {
+  it('should create a Monaco editor with raw options and lifecycle hooks', async () => {
     const fake = createFakeMonaco();
     const beforeMount = vi.fn();
     const onMount = vi.fn();
@@ -76,7 +76,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.createdModels[0].getLanguageId()).toBe('typescript');
   });
 
-  it('updates the live editor without recreating it for mutable props', async () => {
+  it('should update the live editor without recreating it for mutable props', async () => {
     const fake = createFakeMonaco();
     const initialProps: MonacoEditorProps = {
       'aria-label': 'Monaco editor',
@@ -133,7 +133,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.editors[0].getModel()?.getLanguageId()).toBe('javascript');
   });
 
-  it('keeps the editor mounted when its change event updates controlled parent state', async () => {
+  it('should keep the editor mounted when its change event updates controlled parent state', async () => {
     const fake = createFakeMonaco();
 
     function Harness() {
@@ -186,7 +186,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(editor.getValue()).toBe('SELECT 12;');
   });
 
-  it('preserves Monaco DOM across rapid updates and controlled normalization', async () => {
+  it('should preserve Monaco DOM across rapid updates and controlled normalization', async () => {
     const fake = createFakeMonaco();
 
     function Harness() {
@@ -233,7 +233,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.editors[0].getValue()).toBe('SELECT 3;');
   });
 
-  it('still disposes Monaco exactly once after an update and real unmount', async () => {
+  it('should still dispose Monaco exactly once after an update and real unmount', async () => {
     const fake = createFakeMonaco();
 
     function Harness() {
@@ -275,7 +275,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.createdModels[0].disposeCalls).toBe(1);
   });
 
-  it('keeps external models owned by the caller and disposes internal ones', async () => {
+  it('should keep external models owned by the caller and dispose internal ones', async () => {
     const fake = createFakeMonaco();
     const externalFirst = fake.monaco.editor.createModel(
       'first',
@@ -358,7 +358,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(internal.createdModels[0].disposeCalls).toBe(1);
   });
 
-  it('abandons editor creation when async beforeMount resolves after unmount', async () => {
+  it('should abandon editor creation when async beforeMount resolves after unmount', async () => {
     const fake = createFakeMonaco();
     const hostRef = { current: null as HTMLDivElement | null };
     const editorRef = { current: null as MonacoEditorInstance | null };
@@ -414,7 +414,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(monacoRef.current).toBeNull();
   });
 
-  it('loads a new Monaco namespace when a provided namespace is removed', async () => {
+  it('should load a new Monaco namespace when a provided namespace is removed', async () => {
     const first = createFakeMonaco();
     const second = createFakeMonaco();
     const loadMonaco = vi.fn(async () => second.monaco);
@@ -466,7 +466,7 @@ describe('MonacoEditor - jsdom', () => {
     expect(second.createCalls[0].options.model?.getValue()).toBe('loaded');
   });
 
-  it('rejects duplicate wrapper-owned paths and allows explicit model sharing', async () => {
+  it('should reject duplicate wrapper-owned paths and allow explicit model sharing', async () => {
     const fake = createFakeMonaco();
     const onError = vi.fn();
 

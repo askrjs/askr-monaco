@@ -13,7 +13,7 @@ describe('MonacoEditor - real Monaco integration', () => {
     container = undefined;
   });
 
-  it('preserves the editor, model, focus, and view state through controlled updates', async () => {
+  it('should preserve the editor, model, focus, and view state through controlled updates', async () => {
     let editor: MonacoEditorInstance | undefined;
 
     function Harness() {
@@ -74,7 +74,7 @@ describe('MonacoEditor - real Monaco integration', () => {
     expect(model.getValue()).toContain('line 80 updated');
   });
 
-  it('synchronizes an external value without replacing the editor or view state', async () => {
+  it('should synchronize an external value without replacing the editor or view state', async () => {
     let editor: MonacoEditorInstance | undefined;
     let updateValue: ((value: string) => void) | undefined;
 
