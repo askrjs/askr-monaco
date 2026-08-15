@@ -26,6 +26,8 @@ const expectedPackFiles = [
   'README.md',
   'dist/components/index.d.ts',
   'dist/components/index.js',
+  'dist/components/monaco-editor/imperative-host.js',
+  'dist/components/monaco-editor/imperative-host.js.map',
   'dist/components/monaco-editor/index.d.ts',
   'dist/components/monaco-editor/index.js',
   'dist/components/monaco-editor/monaco-editor.d.ts',
