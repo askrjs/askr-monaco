@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/monaco",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Thin Monaco editor wrapper for Askr applications",
   "keywords": [
     "askr",
