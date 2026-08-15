@@ -6,6 +6,7 @@ import type {
 } from '../../../../src';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { MonacoEditor } from '../../../../src';
+import { updateImperativeHost } from '../../../../src/components/monaco-editor/imperative-host';
 import { createFakeMonaco } from '../../../monaco-test-utils';
 import { mount, unmount } from '../../../test-utils';
 import { flushUpdates } from '../../../test-utils';
@@ -34,6 +35,27 @@ describe('MonacoEditor - jsdom', () => {
     unmount(current);
     extraContainers = extraContainers.filter((item) => item !== current);
   }
+
+  it('should retain the imperative host across a transient callback-ref detach', () => {
+    const host = document.createElement('div');
+    const replacement = document.createElement('div');
+    const owner = { host: host as HTMLDivElement | null };
+    const disposeForHostChange = vi.fn();
+
+    expect(updateImperativeHost(owner, null, disposeForHostChange)).toBe(false);
+    expect(owner.host).toBe(host);
+    expect(disposeForHostChange).not.toHaveBeenCalled();
+
+    expect(updateImperativeHost(owner, host, disposeForHostChange)).toBe(true);
+    expect(owner.host).toBe(host);
+    expect(disposeForHostChange).not.toHaveBeenCalled();
+
+    expect(updateImperativeHost(owner, replacement, disposeForHostChange)).toBe(
+      true
+    );
+    expect(owner.host).toBe(replacement);
+    expect(disposeForHostChange).toHaveBeenCalledTimes(1);
+  });
 
   it('should create a Monaco editor with raw options and lifecycle hooks', async () => {
     const fake = createFakeMonaco();

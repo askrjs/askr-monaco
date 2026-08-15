@@ -14,6 +14,7 @@ import type {
   MonacoTextModel,
   MonacoUri,
 } from './monaco-editor.types';
+import { updateImperativeHost } from './imperative-host';
 
 type MonacoController = {
   host: HTMLDivElement | null;
@@ -53,14 +54,15 @@ function createController(initialProps: MonacoEditorProps): MonacoController {
     ownedModelPath: null,
     currentProps: initialProps,
     ref: (node) => {
-      controller.host = node;
-
-      if (node === null) {
+      const attached = updateImperativeHost(controller, node, () => {
         controller.applyGeneration += 1;
         disposeEditor(controller, true);
         syncHostRef(controller);
         syncEditorRef(controller);
         syncMonacoRef(controller);
+      });
+
+      if (!attached) {
         return;
       }
 
