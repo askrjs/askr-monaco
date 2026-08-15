@@ -48,6 +48,9 @@ const model = monaco.editor.createModel(
   browser tests without pretending that touch devices have a keyboard modifier.
 - `MonacoEditor` lazy-loads Monaco by default or accepts an injected namespace.
 - Wrapper-owned concerns are host lifecycle, model wiring, and typed escape hatches.
+- Controlled parent rerenders retain the live editor host, so focus, selection,
+  history, and completion state survive model-content callbacks. Actual component
+  unmount remains the single disposal boundary.
 - Wrapper-owned `path` values must be unique; pass an existing Monaco model
   through `model={monaco.editor.getModel(uri)}` when sharing is intentional.
 

@@ -10,6 +10,14 @@ Controlled value updates preserve Monaco's editor instance and its
 imperatively managed DOM. Updating parent Askr state from
 `onDidChangeModelContent` does not require remounting the wrapper.
 
+Askr may transiently detach a callback ref while reconciling a controlled
+parent update. The wrapper retains its imperative host through that detach and
+uses component cleanup as the authoritative unmount boundary. Consequently,
+focus, selection, undo/redo history, and completion state stay attached to the
+same editor and model. On a real unmount, `onUnmount` runs once before the
+wrapper clears refs and disposes its editor and wrapper-owned model; callers
+should use that hook to dispose registrations they create in `onMount`.
+
 ## Published surface
 
 - `@askrjs/monaco`

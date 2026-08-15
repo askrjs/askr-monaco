@@ -257,6 +257,11 @@ describe('MonacoEditor - jsdom', () => {
 
   it('should still dispose Monaco exactly once after an update and real unmount', async () => {
     const fake = createFakeMonaco();
+    const hostRef = { current: null as HTMLDivElement | null };
+    const editorRef = { current: null as MonacoEditorInstance | null };
+    const monacoRef = { current: null as MonacoNamespace | null };
+    const disposeRegistration = vi.fn();
+    const onUnmount = vi.fn(() => disposeRegistration());
 
     function Harness() {
       const value = state('SELECT 1;');
@@ -264,12 +269,19 @@ describe('MonacoEditor - jsdom', () => {
       return (
         <MonacoEditor
           aria-label="SQL editor"
+          editorRef={editorRef}
           monaco={fake.monaco}
+          monacoRef={monacoRef}
           onMount={(editor) => {
-            editor.onDidChangeModelContent(() => {
+            const registration = editor.onDidChangeModelContent(() => {
               value.set(editor.getValue());
             });
+            disposeRegistration.mockImplementation(() =>
+              registration.dispose()
+            );
           }}
+          onUnmount={onUnmount}
+          ref={hostRef}
           value={value()}
         />
       );
@@ -284,6 +296,9 @@ describe('MonacoEditor - jsdom', () => {
     const host = container.querySelector('[data-askr-monaco-editor]');
     const imperativeChild = document.createElement('div');
     host?.appendChild(imperativeChild);
+    expect(hostRef.current).toBe(host);
+    expect(editorRef.current).toBe(fake.editors[0]);
+    expect(monacoRef.current).toBe(fake.monaco);
 
     fake.editors[0].emitModelContentChange('SELECT 2;');
     unmount(container);
@@ -295,6 +310,11 @@ describe('MonacoEditor - jsdom', () => {
     expect(host?.isConnected).toBe(false);
     expect(fake.editors[0].disposeCalls).toBe(1);
     expect(fake.createdModels[0].disposeCalls).toBe(1);
+    expect(onUnmount).toHaveBeenCalledTimes(1);
+    expect(disposeRegistration).toHaveBeenCalledTimes(1);
+    expect(hostRef.current).toBeNull();
+    expect(editorRef.current).toBeNull();
+    expect(monacoRef.current).toBeNull();
   });
 
   it('should keep external models owned by the caller and dispose internal ones', async () => {

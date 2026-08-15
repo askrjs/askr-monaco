@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        askr-version: ['0.0.62', latest]
+        askr-version: ['0.0.88', '0.0.91', latest]
 
     steps:
       - name: Checkout repository
@@ -39,8 +39,13 @@ jobs:
       - name: Select Askr peer version
         run: npm install --no-save @askrjs/askr@${{ matrix.askr-version }}
 
+      - name: Install Chromium with Linux dependencies
+        run: npx playwright install --with-deps chromium
+
       - name: Test Monaco lifecycle compatibility
-        run: npm run test:jsdom
+        run: |
+          npm run test:jsdom
+          npx vitest run --config vitest.test.browser.config.ts --browser.name=chromium tests/browser/components/monaco-editor/integration.test.tsx
 
   ci:
     name: CI (${{ matrix.os }})

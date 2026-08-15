@@ -9,12 +9,14 @@ export function updateImperativeHost<Host>(
   disposeForHostChange: () => void
 ): boolean {
   const previousHost = owner.host;
-  owner.host = node;
 
   if (node === null) {
-    disposeForHostChange();
+    // Askr can detach a callback ref transiently while reconciling the same
+    // component. The component task cleanup owns real unmount disposal.
     return false;
   }
+
+  owner.host = node;
 
   if (previousHost !== null && previousHost !== node) {
     disposeForHostChange();
