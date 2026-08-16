@@ -28,7 +28,7 @@ describe('Source layout', () => {
       'utf8'
     );
 
-    expect(workflow).toContain("askr-version: ['0.0.88', '0.0.91', latest]");
+    expect(workflow).toContain("askr-version: ['0.2.0', latest]");
     expect(workflow).toContain(
       'tests/browser/components/monaco-editor/integration.test.tsx'
     );
