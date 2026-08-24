@@ -53,6 +53,7 @@ export type MonacoEditorProps = Omit<
   defaultValue?: string;
   language?: string;
   path?: string | MonacoUri;
+  /** Monaco theme name. Monaco applies themes process-wide, so simultaneous editors cannot use different themes. */
   theme?: string;
   monaco?: MonacoNamespace;
   loadMonaco?: MonacoLoader;
