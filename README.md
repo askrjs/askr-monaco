@@ -51,8 +51,13 @@ const model = monaco.editor.createModel(
 - Controlled parent rerenders retain the live editor host, so focus, selection,
   history, and completion state survive model-content callbacks. Actual component
   unmount remains the single disposal boundary.
-- Wrapper-owned `path` values must be unique; pass an existing Monaco model
-  through `model={monaco.editor.getModel(uri)}` when sharing is intentional.
+- Wrapper-owned `path` values (usage without a `model` prop) must be unique.
+  Externally-owned models are exempt from this wrapper check; pass an existing
+  Monaco model through `model={monaco.editor.getModel(uri)}` when sharing is
+  intentional, and retain responsibility for its identity and disposal.
+- Monaco's `setTheme` API is process-global. The `theme` prop configures that
+  shared Monaco namespace, so simultaneous editors cannot display different
+  themes; the most recently applied theme wins.
 
 ## Layout
 

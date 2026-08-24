@@ -155,6 +155,66 @@ describe('MonacoEditor - jsdom', () => {
     expect(fake.editors[0].getModel()?.getLanguageId()).toBe('javascript');
   });
 
+  it('should expose Monaco theme changes as namespace-global across instances', async () => {
+    const fake = createFakeMonaco();
+    container = mount(
+      <MonacoEditor
+        aria-label="Dark editor"
+        monaco={fake.monaco}
+        theme="vs-dark"
+        value="dark"
+      />
+    );
+    mountExtra(
+      <MonacoEditor
+        aria-label="Light editor"
+        monaco={fake.monaco}
+        theme="vs-light"
+        value="light"
+      />
+    );
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+
+    expect(fake.editors).toHaveLength(2);
+    expect(fake.themeCalls).toEqual(['vs-dark', 'vs-light']);
+  });
+
+  it('should dispose each wrapper-owned model exactly once during rapid path replacement', async () => {
+    const fake = createFakeMonaco();
+    let setPath!: (path: string) => void;
+    function Harness() {
+      const path = state('file:///src/0.ts');
+      setPath = path.set;
+      return (
+        <MonacoEditor
+          aria-label="Path editor"
+          monaco={fake.monaco}
+          path={path()}
+          value="value"
+        />
+      );
+    }
+    container = mount(<Harness />);
+    await flushUpdates();
+    await flushUpdates();
+    for (let index = 1; index <= 8; index += 1) {
+      setPath(`file:///src/${index}.ts`);
+      await flushUpdates();
+      await flushUpdates();
+    }
+
+    expect(fake.createdModels).toHaveLength(9);
+    expect(
+      fake.createdModels.slice(0, -1).every((model) => model.disposeCalls === 1)
+    ).toBe(true);
+    expect(
+      fake.createdModels[fake.createdModels.length - 1]?.disposeCalls
+    ).toBe(0);
+    expect(fake.editors[0].disposed).toBe(false);
+  });
+
   it('should keep the editor mounted when its change event updates controlled parent state', async () => {
     const fake = createFakeMonaco();
 
@@ -454,6 +514,19 @@ describe('MonacoEditor - jsdom', () => {
     expect(hostRef.current).toBeNull();
     expect(editorRef.current).toBeNull();
     expect(monacoRef.current).toBeNull();
+
+    const remounted = mountExtra(
+      <MonacoEditor
+        aria-label="Remounted editor"
+        monaco={fake.monaco}
+        value="ready"
+      />
+    );
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+    expect(remounted.querySelector('[data-askr-monaco-editor]')).not.toBeNull();
+    expect(fake.createCalls).toHaveLength(1);
   });
 
   it('should load a new Monaco namespace when a provided namespace is removed', async () => {
