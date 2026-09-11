@@ -60,7 +60,7 @@
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
     "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
-    "test:browser": "vp test run --config vitest.test.browser.config.ts",
+    "test:browser": "playwright test",
     "test:checks": "vp test run -c vitest.test.checks.config.ts",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
@@ -69,12 +69,11 @@
   "devDependencies": {
     "@askrjs/askr": ">=0.2.3 <0.3.0",
     "@askrjs/vite": ">=0.2.1 <0.3.0",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^26.3.0",
-    "@vitest/browser-playwright": "4.1.11",
     "axe-core": "^4.13.0",
     "jsdom": "^30.0.1",
     "monaco-editor": "^0.56.0",
-    "playwright": "^1.62.1",
     "publint": "^0.3.24",
     "typescript": "^7.0.2",
     "vite-plus": "^0.3.1"

@@ -44,7 +44,7 @@ jobs:
       - name: Test Monaco lifecycle compatibility
         run: |
           npm run test:jsdom
-          npx vitest run --config vitest.test.browser.config.ts --browser.name=chromium tests/browser/components/monaco-editor/integration.test.tsx
+          npx playwright test --project=chromium-desktop tests/browser/components/monaco-editor/integration.spec.ts
 
   ci:
     name: CI (${{ matrix.os }})

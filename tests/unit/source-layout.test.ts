@@ -30,7 +30,7 @@ describe('Source layout', () => {
 
     expect(workflow).toContain("askr-version: ['0.2.0', latest]");
     expect(workflow).toContain(
-      'tests/browser/components/monaco-editor/integration.test.tsx'
+      'tests/browser/components/monaco-editor/integration.spec.ts'
     );
   });
 });

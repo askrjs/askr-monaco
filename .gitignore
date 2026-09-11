@@ -5,3 +5,6 @@ coverage
 *.tsbuildinfo
 .vitest-attachments
 **/__screenshots__
+test-results
+playwright-report
+blob-report
