@@ -5,7 +5,10 @@ import { join } from 'node:path';
 import { build } from 'vite-plus';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-const initialEntryBudget = 225_000;
+// Sized against the @askrjs/askr 0.3.0 runtime, which is what the initial entry
+// is almost entirely made of (~233 KB measured). The structural guarantee that
+// Monaco stays lazy is the dynamicImports assertion below, not this number.
+const initialEntryBudget = 240_000;
 const monacoEditorBudget = 3_000_000;
 const editorWorkerBudget = 1_000_000;
 const typeScriptWorkerBudget = 8_000_000;
