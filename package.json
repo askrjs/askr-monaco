@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/monaco",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Thin Monaco editor wrapper for Askr applications",
   "keywords": [
     "askr",
@@ -67,8 +67,8 @@
     "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.2.3 <0.3.0",
-    "@askrjs/vite": ">=0.2.1 <0.3.0",
+    "@askrjs/askr": ">=0.3.0 <0.4.0",
+    "@askrjs/vite": ">=0.3.0 <0.4.0",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.3.0",
     "axe-core": "^4.13.0",
@@ -79,7 +79,7 @@
     "vite-plus": "^0.3.1"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.2.3 <0.3.0",
+    "@askrjs/askr": ">=0.3.0 <0.4.0",
     "monaco-editor": "^0.56.0"
   },
   "overrides": {
