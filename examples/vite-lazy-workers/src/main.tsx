@@ -2,7 +2,9 @@ import { createIsland } from '@askrjs/askr/boot';
 
 import { MonacoEditor } from '../../../src';
 import { loadMonaco } from './load-monaco';
-import './monaco-workers';
+import { configureMonacoWorkers } from './monaco-workers';
+
+configureMonacoWorkers();
 
 const root = document.querySelector<HTMLElement>('#app');
 

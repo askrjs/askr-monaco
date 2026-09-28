@@ -1,4 +1,5 @@
 import type { Ref } from '@askrjs/askr/foundations/utilities';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type * as Monaco from 'monaco-editor';
 
 /** The `monaco-editor` module namespace, either provided directly or resolved by `loadMonaco`. */
