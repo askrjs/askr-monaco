@@ -1,4 +1,5 @@
 import { state } from '@askrjs/askr';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import { task } from '@askrjs/askr/resources';
 import { setRef, type Ref } from '@askrjs/askr/foundations/utilities';
 import type * as Monaco from 'monaco-editor';

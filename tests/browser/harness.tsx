@@ -1,6 +1,7 @@
 import axe from 'axe-core';
 import * as monaco from 'monaco-editor';
 import { state } from '@askrjs/askr';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type { MonacoEditorInstance, MonacoEditorOptions } from '../../src';
 import { MonacoEditor } from '../../src';
 import { createMonacoEditorTestDriver } from '../../src/testing';

@@ -1,4 +1,5 @@
 import { state } from '@askrjs/askr';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 import type {
   MonacoEditorProps,
   MonacoEditorInstance,

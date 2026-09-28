@@ -1,5 +1,6 @@
 import { cleanupApp, createIsland } from '@askrjs/askr/boot';
 import { DefaultPortal } from '@askrjs/askr/foundations/structures';
+import type { JSX } from '@askrjs/askr/jsx-runtime';
 
 export function resetTestState() {
   DefaultPortal.render({ children: undefined });
