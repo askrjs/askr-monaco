@@ -1,9 +1,9 @@
 import type {
   MonacoEditorInstance,
   MonacoTextModel,
-} from '../components/monaco-editor/monaco-editor.types';
+} from '../src/components/monaco-editor/monaco-editor.types';
 
-const TEST_EDIT_SOURCE = '@askrjs/monaco/testing';
+const TEST_EDIT_SOURCE = 'monaco-editor test driver';
 
 export interface MonacoEditorTestDriver {
   /** Select the complete model without relying on a platform modifier key. */
@@ -24,7 +24,7 @@ function requireModel(editor: MonacoEditorInstance): MonacoTextModel {
   const model = editor.getModel();
   if (!model) {
     throw new Error(
-      '@askrjs/monaco/testing requires an editor with an attached model.'
+      'monaco-editor test driver requires an editor with an attached model.'
     );
   }
   return model;
@@ -41,7 +41,9 @@ function applyEdit(
   ]);
   editor.pushUndoStop();
   if (!applied) {
-    throw new Error('@askrjs/monaco/testing could not apply the model edit.');
+    throw new Error(
+      'monaco-editor test driver could not apply the model edit.'
+    );
   }
 }
 

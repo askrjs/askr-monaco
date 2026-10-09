@@ -2,36 +2,10 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vite-plus';
-import packageJson from './package.json' with { type: 'json' };
 
 const srcRoot = fileURLToPath(new URL('./src', import.meta.url));
 
-function createPackageEntries() {
-  return Object.fromEntries(
-    Object.keys(packageJson.exports)
-      .filter((subpath) => subpath !== './package.json')
-      .map((subpath) => {
-        if (subpath === '.') {
-          return ['index', resolve(srcRoot, 'index.ts')];
-        }
-
-        const entryName = subpath.slice(2);
-        const entryPath =
-          entryName === 'monaco-editor'
-            ? resolve(srcRoot, 'components', entryName, 'index.ts')
-            : resolve(srcRoot, entryName, 'index.ts');
-
-        return [
-          entryName === 'monaco-editor'
-            ? `components/${entryName}/index`
-            : `${entryName}/index`,
-          entryPath,
-        ];
-      })
-  );
-}
-
-const packageEntries = createPackageEntries();
+const packageEntries = { index: resolve(srcRoot, 'index.ts') };
 
 export default defineConfig({
   fmt: {

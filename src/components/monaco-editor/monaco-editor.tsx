@@ -412,11 +412,17 @@ async function ensureEditor(
     monaco.editor.setTheme(controller.currentProps.theme);
   }
 
-  const nextEditor = monaco.editor.create(
-    controller.host as HTMLDivElement,
-    buildCreateOptions(controller, model),
-    controller.currentProps.overrideServices
-  );
+  let nextEditor: MonacoEditorInstance;
+  try {
+    nextEditor = monaco.editor.create(
+      controller.host as HTMLDivElement,
+      buildCreateOptions(controller, model),
+      controller.currentProps.overrideServices
+    );
+  } catch (error) {
+    disposeOwnedModel(controller);
+    throw error;
+  }
 
   controller.editor = nextEditor;
   controller.lastOverrideServices = controller.currentProps.overrideServices;
@@ -467,31 +473,31 @@ function startLoadingMonaco(
 
   const generation = ++controller.loadGeneration;
   controller.loadingLoader = load;
-  controller.loadingPromise = Promise.resolve(load()).then(
-    (monaco) => {
-      controller.loadingPromise = null;
+  controller.loadingPromise = Promise.resolve()
+    .then(load)
+    .then(
+      (monaco) => {
+        if (
+          controller.disposed ||
+          controller.loadGeneration !== generation ||
+          controller.currentProps.monaco !== undefined
+        ) {
+          return;
+        }
 
-      if (
-        controller.disposed ||
-        controller.loadGeneration !== generation ||
-        controller.currentProps.monaco !== undefined
-      ) {
-        return;
+        controller.loadingPromise = null;
+        controller.monaco = monaco;
+        controller.monacoSource = 'loaded';
+        syncMonacoRef(controller);
+        scheduleApply(controller);
+      },
+      (error) => {
+        if (!controller.disposed && controller.loadGeneration === generation) {
+          controller.loadingPromise = null;
+          notifyError(controller.currentProps.onError, error);
+        }
       }
-
-      controller.monaco = monaco;
-      controller.monacoSource = 'loaded';
-      syncMonacoRef(controller);
-      scheduleApply(controller);
-    },
-    (error) => {
-      controller.loadingPromise = null;
-
-      if (!controller.disposed && controller.loadGeneration === generation) {
-        notifyError(controller.currentProps.onError, error);
-      }
-    }
-  );
+    );
 }
 
 async function applyController(controller: MonacoController) {
