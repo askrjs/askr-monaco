@@ -7,11 +7,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@askrjs/askr",
     "paths": {
-      "@askrjs/monaco": ["./src/index.ts"],
-      "@askrjs/monaco/monaco-editor": [
-        "./src/components/monaco-editor/index.ts"
-      ],
-      "@askrjs/monaco/testing": ["./src/testing/index.ts"]
+      "@askrjs/monaco": ["./src/index.ts"]
     }
   },
   "include": ["tests/**/*", "src/**/*.ts", "src/**/*.tsx", "types/**/*.d.ts"]

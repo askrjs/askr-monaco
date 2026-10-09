@@ -1,2 +1,5 @@
-export * from './monaco-editor';
-export type * from './monaco-editor.types';
+export { MonacoEditor } from './monaco-editor';
+export type {
+  MonacoEditorOptions,
+  MonacoEditorProps,
+} from './monaco-editor.types';
