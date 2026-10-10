@@ -19,6 +19,11 @@
 
 ### Fixes
 
+- Validate Monaco with DOMPurify 3.4.16, which fixes GHSA-p98j-92pf-mc4p and
+  GHSA-6688-9rhm-gjv2. This repository override does not control an application's
+  dependency tree; applications must also resolve a patched DOMPurify version.
+- Update the locked development toolchain within its existing ranges to use
+  patched Tinypool 2.1.2 and source-map-js 1.2.2.
 - Deliver synchronous loader exceptions to `onError`, matching rejected loaders.
 - Ignore obsolete loader completions before they clear the active load, so
   unrelated updates cannot start duplicate loads.
