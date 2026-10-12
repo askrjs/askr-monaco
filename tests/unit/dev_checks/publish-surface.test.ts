@@ -14,10 +14,17 @@ type PackFile = {
 };
 
 type PackResult = {
+  id: string;
+  name: string;
+  version: string;
+  filename: string;
+  integrity: string;
   files: PackFile[];
 };
 
 type PackageJson = {
+  name: string;
+  version: string;
   exports: Record<string, ExportTarget | string>;
 };
 
@@ -47,6 +54,54 @@ function readPackageJson(): PackageJson {
   ) as PackageJson;
 }
 
+function readPackResult(
+  output: string,
+  expected: Pick<PackageJson, 'name' | 'version'>
+): PackResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(output);
+  } catch {
+    throw new Error(
+      'Expected npm pack --json to return one name-keyed package record'
+    );
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(
+      'Expected npm pack --json to return one name-keyed package record'
+    );
+  }
+  const keys = Object.keys(parsed);
+  const record = (parsed as Record<string, unknown>)[
+    expected.name
+  ] as Partial<PackResult> | null;
+  const expectedFilename = `${expected.name.replace(/^@/, '').replace('/', '-')}-${expected.version}.tgz`;
+  if (
+    keys.length !== 1 ||
+    keys[0] !== expected.name ||
+    record === null ||
+    typeof record !== 'object' ||
+    record.id !== `${expected.name}@${expected.version}` ||
+    record.name !== expected.name ||
+    record.version !== expected.version ||
+    record.filename !== expectedFilename ||
+    typeof record.integrity !== 'string' ||
+    !/^sha512-[A-Za-z0-9+/]{86}==$/.test(record.integrity) ||
+    !Array.isArray(record.files) ||
+    !record.files.every(
+      (file) =>
+        file !== null &&
+        typeof file === 'object' &&
+        typeof file.path === 'string'
+    )
+  ) {
+    throw new Error(
+      'Expected npm pack --json to return one valid record for the expected package'
+    );
+  }
+  return record as PackResult;
+}
+
 function runNpmCommand(args: string[]) {
   const npmCliPath = process.env.npm_execpath;
   if (!npmCliPath) {
@@ -59,6 +114,68 @@ function runNpmCommand(args: string[]) {
     stdio: 'pipe',
   });
 }
+
+describe('npm 12 pack JSON', () => {
+  const expected = { name: '@askrjs/monaco', version: '0.5.0' };
+  const record = {
+    id: '@askrjs/monaco@0.5.0',
+    name: '@askrjs/monaco',
+    version: '0.5.0',
+    filename: 'askrjs-monaco-0.5.0.tgz',
+    integrity: `sha512-${Buffer.alloc(64).toString('base64')}`,
+    files: [{ path: 'package.json' }],
+  };
+  it('accepts the single expected npm 12 keyed record', () => {
+    expect(
+      readPackResult(JSON.stringify({ [expected.name]: record }), expected)
+    ).toEqual(record);
+  });
+  it.each([
+    ['invalid JSON', '{'],
+    ['array instead of npm 12 keyed object', JSON.stringify([record])],
+    ['null result', 'null'],
+    ['empty result', '{}'],
+    ['wrong package key', JSON.stringify({ '@askrjs/other': record })],
+    [
+      'multiple packages',
+      JSON.stringify({ [expected.name]: record, other: record }),
+    ],
+    [
+      'wrong package id',
+      JSON.stringify({ [expected.name]: { ...record, id: 'other@0.5.0' } }),
+    ],
+    [
+      'wrong package name',
+      JSON.stringify({ [expected.name]: { ...record, name: 'other' } }),
+    ],
+    [
+      'wrong version',
+      JSON.stringify({ [expected.name]: { ...record, version: '0.4.0' } }),
+    ],
+    [
+      'unsafe filename',
+      JSON.stringify({
+        [expected.name]: { ...record, filename: '../package.tgz' },
+      }),
+    ],
+    [
+      'invalid SRI',
+      JSON.stringify({
+        [expected.name]: { ...record, integrity: 'sha512-invalid' },
+      }),
+    ],
+    [
+      'missing files list',
+      JSON.stringify({ [expected.name]: { ...record, files: null } }),
+    ],
+    [
+      'invalid file path',
+      JSON.stringify({ [expected.name]: { ...record, files: [{ path: 1 }] } }),
+    ],
+  ])('rejects %s', (_label, output) => {
+    expect(() => readPackResult(output, expected)).toThrow(/npm pack --json/);
+  });
+});
 
 describe('Publish surface checks', () => {
   let packageJson: PackageJson;
@@ -74,7 +191,7 @@ describe('Publish surface checks', () => {
       '--dry-run',
       '--json',
     ]);
-    const [result] = JSON.parse(output) as PackResult[];
+    const result = readPackResult(output, packageJson);
 
     packFilePaths = result.files.map((file) => file.path).sort();
   });
