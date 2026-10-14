@@ -62,9 +62,7 @@ function readPackResult(
   try {
     parsed = JSON.parse(output);
   } catch {
-    throw new Error(
-      'Expected npm pack --json to return one package record'
-    );
+    throw new Error('Expected npm pack --json to return one package record');
   }
 
   let recordValue: unknown;
