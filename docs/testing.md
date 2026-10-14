@@ -1,35 +1,42 @@
 # Testing editor interactions
 
-`@askrjs/monaco/testing` provides a small driver for deterministic editor
-interaction tests. It edits the real Monaco model through the editor API, so
-selection, completion replacement, undo, and redo exercise Monaco's actual
-editing and history behavior without depending on browser-specific key events.
+Use Monaco's native editor and model APIs to make editor interaction tests
+independent of desktop keyboard mappings. The 0.5 runtime package removes
+`@askrjs/monaco/testing`, `createMonacoEditorTestDriver`, and
+`MonacoEditorTestDriver`; the repository's driver is a private test helper.
+
+Create controls after `onMount` supplies the live editor. For example:
 
 ```ts
-import { createMonacoEditorTestDriver } from '@askrjs/monaco/testing';
+import type * as Monaco from 'monaco-editor';
 
-const driver = createMonacoEditorTestDriver(editor);
+function replaceAll(
+  editor: Monaco.editor.IStandaloneCodeEditor,
+  value: string
+) {
+  const model = editor.getModel();
+  if (!model) throw new Error('An attached model is required');
+  editor.pushUndoStop();
+  const applied = editor.executeEdits('application-test', [
+    { range: model.getFullModelRange(), text: value, forceMoveMarkers: true },
+  ]);
+  editor.pushUndoStop();
+  if (!applied) throw new Error('The model edit failed');
+}
 
-driver.selectAll();
-driver.deleteSelection();
-driver.replaceAll('SEL');
-driver.trigger('editor.action.triggerSuggest');
-driver.trigger('acceptSelectedSuggestion');
-driver.undo();
-driver.redo();
+replaceAll(editor, 'SEL');
+editor.trigger('application-test', 'editor.action.triggerSuggest', null);
+editor.trigger('application-test', 'acceptSelectedSuggestion', null);
+editor.trigger('application-test', 'undo', null);
+editor.trigger('application-test', 'redo', null);
 ```
 
-Create the driver after `onMount` supplies the editor instance. Completion
-providers and suggestion UI can schedule asynchronous work, so wait for the
-application-visible result before accepting a completion.
+Completion providers and suggestion UI can schedule asynchronous work. Wait for
+the application-visible result before accepting a completion, and dispose
+registrations you create through `onUnmount`.
 
-## Primary modifier contract
-
-Monaco owns keyboard bindings. The primary modifier is `Meta` on macOS and
-`Control` on Windows and Linux. Touch-device emulation does not imply a
-physical keyboard or a primary-modifier mapping, so tests that must run on both
-desktop Chromium and an emulated mobile device should use the driver instead of
-synthesizing `Control+A` or `Meta+A`.
-
-The browser suite runs the same selection, deletion, completion, undo, and redo
-contract in desktop Chromium, Pixel 7 emulation, Firefox, and WebKit.
+Monaco owns keyboard bindings: `Meta` on macOS, `Control` on Windows/Linux.
+Touch-device emulation does not imply a physical keyboard. Tests that run on
+both desktop and mobile should use the editor API for deterministic edits.
+The browser suite exercises selection, deletion, completion, undo, and redo in
+desktop Chromium, Pixel 7 emulation, Firefox, and WebKit.

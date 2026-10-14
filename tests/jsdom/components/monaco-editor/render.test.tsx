@@ -1,10 +1,10 @@
 import { state } from '@askrjs/askr';
 import type { JSX } from '@askrjs/askr/jsx-runtime';
+import type { MonacoEditorProps } from '../../../../src';
 import type {
-  MonacoEditorProps,
   MonacoEditorInstance,
   MonacoNamespace,
-} from '../../../../src';
+} from '../../../../src/components/monaco-editor/monaco-editor.types';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { MonacoEditor } from '../../../../src';
 import { updateImperativeHost } from '../../../../src/components/monaco-editor/imperative-host';
@@ -640,5 +640,328 @@ describe('MonacoEditor - jsdom', () => {
     unmountExtra(explicitContainer);
 
     expect(sharedModel.disposeCalls).toBe(0);
+  });
+  it('should report a synchronous loader failure and recover with a new loader', async () => {
+    const fake = createFakeMonaco();
+    const error = new Error('loader failed synchronously');
+    const onError = vi.fn();
+    const editorRef = { current: null as MonacoEditorInstance | null };
+    const monacoRef = { current: null as MonacoNamespace | null };
+    let setLoader!: (
+      loader: () => MonacoNamespace | PromiseLike<MonacoNamespace>
+    ) => void;
+    function Harness() {
+      const loader = state<NonNullable<MonacoEditorProps['loadMonaco']>>(() => {
+        throw error;
+      });
+      setLoader = (next) => loader.set(() => next);
+      return (
+        <MonacoEditor
+          aria-label="Loader editor"
+          loadMonaco={loader()}
+          onError={onError}
+          editorRef={editorRef}
+          monacoRef={monacoRef}
+        />
+      );
+    }
+    container = mount(<Harness />);
+    await flushUpdates();
+    await flushUpdates();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+    expect(editorRef.current).toBeNull();
+    expect(monacoRef.current).toBeNull();
+    setLoader(() => fake.monaco);
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+    expect(fake.createCalls).toHaveLength(1);
+    expect(editorRef.current).toBe(fake.editors[0]);
+  });
+
+  it('should report a rejected loader once and leave no partial editor or model', async () => {
+    const fake = createFakeMonaco();
+    const error = new Error('load rejected');
+    const onError = vi.fn();
+    const editorRef = { current: null as MonacoEditorInstance | null };
+    const monacoRef = { current: null as MonacoNamespace | null };
+    container = mount(
+      <MonacoEditor
+        aria-label="Failed editor"
+        loadMonaco={() => Promise.reject(error)}
+        onError={onError}
+        editorRef={editorRef}
+        monacoRef={monacoRef}
+      />
+    );
+    await flushUpdates();
+    await flushUpdates();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+    expect(editorRef.current).toBeNull();
+    expect(monacoRef.current).toBeNull();
+    expect(fake.createdModels).toHaveLength(0);
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'should not clear the current loader when an obsolete loader %ss',
+    async (outcome) => {
+      const obsolete = createFakeMonaco();
+      const current = createFakeMonaco();
+      let resolveObsolete!: (monaco: MonacoNamespace) => void;
+      let rejectObsolete!: (error: Error) => void;
+      let resolveCurrent!: (monaco: MonacoNamespace) => void;
+      const first = () =>
+        new Promise<MonacoNamespace>((resolve, reject) => {
+          resolveObsolete = resolve;
+          rejectObsolete = reject;
+        });
+      const pending = new Promise<MonacoNamespace>((resolve) => {
+        resolveCurrent = resolve;
+      });
+      const second = vi.fn(() => pending);
+      const onError = vi.fn();
+      let setProps!: (
+        updater: (prev: MonacoEditorProps) => MonacoEditorProps
+      ) => void;
+      function Harness() {
+        const props = state<MonacoEditorProps>({
+          loadMonaco: first,
+          onError,
+          path: 'file:///first.ts',
+        });
+        setProps = props.set;
+        return <MonacoEditor aria-label="Pending editor" {...props()} />;
+      }
+      container = mount(<Harness />);
+      await flushUpdates();
+      setProps((props) => ({ ...props, loadMonaco: second }));
+      await flushUpdates();
+      expect(second).toHaveBeenCalledTimes(1);
+      if (outcome === 'resolve') resolveObsolete(obsolete.monaco);
+      else rejectObsolete(new Error('obsolete failure'));
+      await flushUpdates();
+      setProps((props) => ({
+        ...props,
+        path: 'file:///latest.ts',
+        value: 'latest',
+      }));
+      await flushUpdates();
+      expect(second).toHaveBeenCalledTimes(1);
+      resolveCurrent(current.monaco);
+      await flushUpdates();
+      await flushUpdates();
+      await flushUpdates();
+      expect(obsolete.createCalls).toHaveLength(0);
+      expect(onError).not.toHaveBeenCalled();
+      expect(current.createCalls).toHaveLength(1);
+      expect(current.createdModels[0].uri.toString()).toBe('file:///latest.ts');
+      expect(current.createdModels[0].getValue()).toBe('latest');
+    }
+  );
+
+  it('should create only the latest external model when loading finishes after replacement', async () => {
+    const fake = createFakeMonaco();
+    const firstModel = fake.monaco.editor.createModel('first');
+    const latestModel = fake.monaco.editor.createModel('latest');
+    let resolveLoad!: (monaco: MonacoNamespace) => void;
+    const loadMonaco = vi.fn(
+      () =>
+        new Promise<MonacoNamespace>((resolve) => {
+          resolveLoad = resolve;
+        })
+    );
+    let setModel!: (model: typeof firstModel) => void;
+    function Harness() {
+      const model = state(firstModel);
+      setModel = model.set;
+      return (
+        <MonacoEditor
+          aria-label="Model editor"
+          loadMonaco={loadMonaco}
+          model={model()}
+        />
+      );
+    }
+    container = mount(<Harness />);
+    await flushUpdates();
+    setModel(latestModel);
+    await flushUpdates();
+    expect(loadMonaco).toHaveBeenCalledTimes(1);
+    resolveLoad(fake.monaco);
+    await flushUpdates();
+    await flushUpdates();
+    await flushUpdates();
+    expect(fake.createCalls).toHaveLength(1);
+    expect(fake.editors[0].getModel()).toBe(latestModel);
+    expect(fake.createdModels).toHaveLength(2);
+    unmount(container);
+    container = undefined;
+    expect(fake.editors[0].disposeCalls).toBe(1);
+    expect(fake.createdModels.map((model) => model.disposeCalls)).toEqual([
+      0, 0,
+    ]);
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'should ignore a loader that %ss after unmount',
+    async (outcome) => {
+      const fake = createFakeMonaco();
+      const onError = vi.fn();
+      const onMount = vi.fn();
+      const editorRef = { current: null as MonacoEditorInstance | null };
+      const monacoRef = { current: null as MonacoNamespace | null };
+      let resolveLoad!: (monaco: MonacoNamespace) => void;
+      let rejectLoad!: (error: Error) => void;
+      container = mount(
+        <MonacoEditor
+          aria-label="Unmounting editor"
+          onError={onError}
+          onMount={onMount}
+          editorRef={editorRef}
+          monacoRef={monacoRef}
+          loadMonaco={() =>
+            new Promise<MonacoNamespace>((resolve, reject) => {
+              resolveLoad = resolve;
+              rejectLoad = reject;
+            })
+          }
+        />
+      );
+      await flushUpdates();
+      unmount(container);
+      container = undefined;
+      if (outcome === 'resolve') resolveLoad(fake.monaco);
+      else rejectLoad(new Error('late load failure'));
+      await flushUpdates();
+      await flushUpdates();
+      expect(onError).not.toHaveBeenCalled();
+      expect(onMount).not.toHaveBeenCalled();
+      expect(fake.createCalls).toHaveLength(0);
+      expect(fake.createdModels).toHaveLength(0);
+      expect(editorRef.current).toBeNull();
+      expect(monacoRef.current).toBeNull();
+    }
+  );
+
+  it('should release an owned model after editor creation fails and allow recovery', async () => {
+    const fake = createFakeMonaco();
+    const error = new Error('editor creation failed');
+    vi.spyOn(fake.monaco.editor, 'create').mockImplementationOnce(() => {
+      throw error;
+    });
+    const onError = vi.fn();
+    const editorRef = { current: null as MonacoEditorInstance | null };
+    let setValue!: (value: string) => void;
+    function Harness() {
+      const value = state('first');
+      setValue = value.set;
+      return (
+        <MonacoEditor
+          aria-label="Recovery editor"
+          monaco={fake.monaco}
+          path="file:///recovery.ts"
+          value={value()}
+          onError={onError}
+          editorRef={editorRef}
+        />
+      );
+    }
+    container = mount(<Harness />);
+    await flushUpdates();
+    await flushUpdates();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+    expect(editorRef.current).toBeNull();
+    expect(fake.createdModels[0].disposeCalls).toBe(1);
+    expect(fake.monaco.editor.getModel(fake.createdModels[0].uri)).toBeNull();
+    setValue('recovered');
+    await flushUpdates();
+    await flushUpdates();
+    expect(fake.editors).toHaveLength(1);
+    expect(fake.editors[0].getValue()).toBe('recovered');
+    expect(editorRef.current).toBe(fake.editors[0]);
+    unmount(container);
+    container = undefined;
+    expect(fake.createdModels.map((model) => model.disposeCalls)).toEqual([
+      1, 1,
+    ]);
+    expect(fake.editors[0].disposeCalls).toBe(1);
+  });
+  it('should release listeners, models and refs exactly once through repeated mounts', async () => {
+    const fake = createFakeMonaco();
+    const listener = vi.fn();
+    const disposals: ReturnType<typeof vi.fn>[] = [];
+    const onUnmount = vi.fn();
+    for (let index = 0; index < 8; index += 1) {
+      const editorRef = { current: null as MonacoEditorInstance | null };
+      const monacoRef = { current: null as MonacoNamespace | null };
+      let disposeRegistration = () => {};
+      let setValue!: (value: string) => void;
+      function Harness() {
+        const value = state('seed');
+        setValue = value.set;
+        return (
+          <MonacoEditor
+            aria-label="Repeated editor"
+            monaco={fake.monaco}
+            editorRef={editorRef}
+            monacoRef={monacoRef}
+            value={value()}
+            onMount={(editor) => {
+              const registration = editor.onDidChangeModelContent(listener);
+              const dispose = vi.fn(() => registration.dispose());
+              disposals.push(dispose);
+              disposeRegistration = dispose;
+            }}
+            onUnmount={() => {
+              onUnmount();
+              disposeRegistration();
+            }}
+          />
+        );
+      }
+      const mounted = mountExtra(<Harness />);
+      await flushUpdates();
+      await flushUpdates();
+      const editor = fake.editors[index];
+      editor.emitModelContentChange('changed');
+      expect(listener).toHaveBeenCalledTimes(index + 1);
+      unmountExtra(mounted);
+      setValue('after unmount');
+      await flushUpdates();
+      expect(editor.disposeCalls).toBe(1);
+      expect(fake.createdModels[index].disposeCalls).toBe(1);
+      expect(disposals[index]).toHaveBeenCalledTimes(1);
+      expect(editorRef.current).toBeNull();
+      expect(monacoRef.current).toBeNull();
+      expect(editor.updateOptionsCalls).toHaveLength(0);
+      expect(editor.setModelCalls).toHaveLength(0);
+    }
+    expect(onUnmount).toHaveBeenCalledTimes(8);
+    expect(fake.editors).toHaveLength(8);
+  });
+
+  it('should retain a caller-owned model when editor creation fails', async () => {
+    const fake = createFakeMonaco();
+    const model = fake.monaco.editor.createModel('external');
+    const error = new Error('external editor creation failed');
+    vi.spyOn(fake.monaco.editor, 'create').mockImplementationOnce(() => {
+      throw error;
+    });
+    const onError = vi.fn();
+    container = mount(
+      <MonacoEditor
+        aria-label="External failure"
+        monaco={fake.monaco}
+        model={model}
+        onError={onError}
+      />
+    );
+    await flushUpdates();
+    await flushUpdates();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+    unmount(container);
+    container = undefined;
+    expect(fake.createdModels[0].disposeCalls).toBe(0);
+    expect(model.getValue()).toBe('external');
   });
 });

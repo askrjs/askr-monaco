@@ -1,16 +1,8 @@
 import type * as Monaco from 'monaco-editor';
 import { MonacoEditor } from '../../../src';
-import type {
-  MonacoEditorInstance,
-  MonacoEditorOptions,
-  MonacoEditorProps,
-  MonacoNamespace,
-} from '../../../src';
-import { MonacoEditor as MonacoEditorSubpath } from '@askrjs/monaco/monaco-editor';
-import {
-  createMonacoEditorTestDriver,
-  type MonacoEditorTestDriver,
-} from '@askrjs/monaco/testing';
+import type { MonacoEditorOptions, MonacoEditorProps } from '../../../src';
+type MonacoEditorInstance = Monaco.editor.IStandaloneCodeEditor;
+type MonacoNamespace = typeof import('monaco-editor/editor/editor.api');
 
 const options: MonacoEditorOptions = {
   automaticLayout: true,
@@ -48,10 +40,4 @@ const invalidOptions: MonacoEditorOptions = { model: null };
 void props;
 void controlledProps;
 void MonacoEditor;
-void MonacoEditorSubpath;
-const testDriver = createMonacoEditorTestDriver(
-  null as unknown as MonacoEditorInstance
-);
-const typedTestDriver: MonacoEditorTestDriver = testDriver;
-void typedTestDriver;
 void invalidOptions;

@@ -43,9 +43,9 @@ const model = monaco.editor.createModel(
 
 ## Status
 
-- Root package and direct subpath exports expose the thin wrapper.
-- `@askrjs/monaco/testing` exposes deterministic model-editing helpers for
-  browser tests without pretending that touch devices have a keyboard modifier.
+- The root exports `MonacoEditor`, `MonacoEditorProps`, and `MonacoEditorOptions`.
+- Editor tests use Monaco's native model/edit APIs; deterministic driver code
+  lives in this repository's test suite.
 - `MonacoEditor` lazy-loads Monaco by default or accepts an injected namespace.
 - Wrapper-owned concerns are host lifecycle, model wiring, and typed escape hatches.
 - Controlled parent rerenders retain the live editor host, so focus, selection,
@@ -71,3 +71,19 @@ const model = monaco.editor.createModel(
 - [Package overview](./docs/askr-monaco.md)
 - [Testing editor interactions](./docs/testing.md)
 - [Vite and Rolldown lazy workers](./docs/vite-lazy-workers.md)
+
+## Migrating to 0.5
+
+Import the component and its wrapper-specific props/options from `@askrjs/monaco`.
+The duplicate `@askrjs/monaco/monaco-editor` path and test-only
+`@askrjs/monaco/testing` path are removed. The two test-driver exports move into
+this repository's private test helpers; use Monaco's native edit and history
+APIs in application tests (see [testing guidance](./docs/testing.md)).
+
+Native aliases `MonacoEditorInstance`, `MonacoTextModel`, `MonacoUri`, and
+`MonacoNamespace` are private: use `monaco-editor` types
+`editor.IStandaloneCodeEditor`, `editor.ITextModel`, `Uri`, and
+`typeof import('monaco-editor/editor/editor.api')`. Callback aliases
+`MonacoLoader`, `MonacoBeforeMount`, `MonacoMountHandler`, and `MonacoErrorHandler`
+are private: derive callbacks from `MonacoEditorProps['loadMonaco']`,
+`['beforeMount']`, `['onMount']`/`['onUnmount']`, and `['onError']`.

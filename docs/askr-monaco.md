@@ -21,8 +21,7 @@ should use that hook to dispose registrations they create in `onMount`.
 ## Published surface
 
 - `@askrjs/monaco`
-- `@askrjs/monaco/monaco-editor`
-- `@askrjs/monaco/testing`
+- `@askrjs/monaco/package.json` (installed metadata)
 
 ## Install
 
@@ -62,3 +61,5 @@ const model = monaco.editor.createModel(
 For deterministic editor tests and production worker loading, see
 [Testing editor interactions](./testing.md) and
 [Vite and Rolldown lazy workers](./vite-lazy-workers.md).
+
+See the README's [0.5 migration guidance](../README.md#migrating-to-05) for removed names and paths.

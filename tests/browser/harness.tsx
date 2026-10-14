@@ -2,9 +2,10 @@ import axe from 'axe-core';
 import * as monaco from 'monaco-editor';
 import { state } from '@askrjs/askr';
 import type { JSX } from '@askrjs/askr/jsx-runtime';
-import type { MonacoEditorInstance, MonacoEditorOptions } from '../../src';
+import type { MonacoEditorOptions } from '../../src';
+type MonacoEditorInstance = monaco.editor.IStandaloneCodeEditor;
 import { MonacoEditor } from '../../src';
-import { createMonacoEditorTestDriver } from '../../src/testing';
+import { createMonacoEditorTestDriver } from '../monaco-editor-driver';
 import {
   createFakeMonaco,
   neverLoadMonaco,
@@ -437,6 +438,63 @@ function createHarness() {
 
     focusEditor() {
       editor!.focus();
+    },
+
+    async boundaryEdits() {
+      let mountedEditor!: MonacoEditorInstance;
+      container = mount(
+        <MonacoEditor
+          aria-label="Boundary editor"
+          monaco={monaco}
+          defaultValue="seed"
+          options={historyOptions}
+          onMount={(editor) => {
+            mountedEditor = editor;
+          }}
+        />
+      );
+      await settle();
+      const attachedModel = mountedEditor.getModel()!;
+      const first = createMonacoEditorTestDriver(mountedEditor);
+      const second = createMonacoEditorTestDriver(mountedEditor);
+      await Promise.all([
+        Promise.resolve().then(() => first.replaceAll('first')),
+        Promise.resolve().then(() => second.replaceAll('second')),
+      ]);
+      const concurrentValue = attachedModel.getValue();
+      second.undo();
+      const undoSecond = attachedModel.getValue();
+      first.undo();
+      const undoFirst = attachedModel.getValue();
+      first.replaceAll('');
+      first.selectAll();
+      first.deleteSelection();
+      const emptyValue = attachedModel.getValue();
+      const invalidRange = new monaco.Range(999, 999, 1000, 1000);
+      const normalizedRange = attachedModel.validateRange(invalidRange);
+      const applied = mountedEditor.executeEdits('boundary-test', [
+        { range: invalidRange, text: 'clamped' },
+      ]);
+      const clampedValue = attachedModel.getValue();
+      unmount(container);
+      container = undefined;
+      let staleDriverError = '';
+      try {
+        first.replaceAll('stale');
+      } catch (error) {
+        staleDriverError = String(error);
+      }
+      return {
+        concurrentValue,
+        undoSecond,
+        undoFirst,
+        emptyValue,
+        applied,
+        clampedValue,
+        normalizedRange: normalizedRange.toString(),
+        staleDriverError,
+        modelDisposed: attachedModel.isDisposed(),
+      };
     },
 
     /* ---------------------------------------------------------------- */

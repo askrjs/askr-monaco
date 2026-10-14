@@ -1,6 +1,6 @@
 {
   "name": "@askrjs/monaco",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Thin Monaco editor wrapper for Askr applications",
   "keywords": [
     "askr",
@@ -34,14 +34,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./monaco-editor": {
-      "types": "./dist/components/monaco-editor/index.d.ts",
-      "import": "./dist/components/monaco-editor/index.js"
-    },
-    "./testing": {
-      "types": "./dist/testing/index.d.ts",
-      "import": "./dist/testing/index.js"
-    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -59,16 +51,17 @@
     "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:publint && npm run pack:check",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check",
-    "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser",
+    "test": "npm run test:unit && npm run test:checks && npm run test:jsdom && npm run test:browser && npm run test:exports",
     "test:browser": "playwright test",
     "test:checks": "vp test run -c vitest.test.checks.config.ts",
     "test:jsdom": "npm run build && vp test run --config vitest.test.jsdom.config.ts",
     "test:types": "tsc -p tsconfig.type-tests.json --noEmit",
-    "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts"
+    "test:unit": "npm run test:types && vp test run --config vitest.test.unit.config.ts",
+    "test:exports": "node tests/package-surface.js"
   },
   "devDependencies": {
-    "@askrjs/askr": ">=0.4.0 <0.5.0",
-    "@askrjs/vite": ">=0.4.0 <0.5.0",
+    "@askrjs/askr": ">=0.5.0 <0.6.0",
+    "@askrjs/vite": ">=0.5.0 <0.6.0",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.3.0",
     "axe-core": "^4.13.0",
@@ -79,11 +72,11 @@
     "vite-plus": "^0.3.1"
   },
   "peerDependencies": {
-    "@askrjs/askr": ">=0.4.0 <0.5.0",
+    "@askrjs/askr": ">=0.5.0 <0.6.0",
     "monaco-editor": "^0.56.0"
   },
   "overrides": {
-    "dompurify": "3.4.13"
+    "dompurify": "3.4.16"
   },
   "engines": {
     "node": ">=24.0.0"
