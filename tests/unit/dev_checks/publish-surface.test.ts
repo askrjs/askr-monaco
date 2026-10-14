@@ -63,24 +63,31 @@ function readPackResult(
     parsed = JSON.parse(output);
   } catch {
     throw new Error(
-      'Expected npm pack --json to return one name-keyed package record'
+      'Expected npm pack --json to return one package record'
     );
   }
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error(
-      'Expected npm pack --json to return one name-keyed package record'
-    );
+
+  let recordValue: unknown;
+  if (Array.isArray(parsed)) {
+    if (parsed.length !== 1) {
+      throw new Error('Expected npm pack --json to return one package record');
+    }
+    recordValue = parsed[0];
+  } else if (parsed !== null && typeof parsed === 'object') {
+    const keys = Object.keys(parsed);
+    if (keys.length !== 1 || keys[0] !== expected.name) {
+      throw new Error('Expected npm pack --json to return one package record');
+    }
+    recordValue = (parsed as Record<string, unknown>)[expected.name];
+  } else {
+    throw new Error('Expected npm pack --json to return one package record');
   }
-  const keys = Object.keys(parsed);
-  const record = (parsed as Record<string, unknown>)[
-    expected.name
-  ] as Partial<PackResult> | null;
+  const record = recordValue as Partial<PackResult> | null;
   const expectedFilename = `${expected.name.replace(/^@/, '').replace('/', '-')}-${expected.version}.tgz`;
   if (
-    keys.length !== 1 ||
-    keys[0] !== expected.name ||
     record === null ||
     typeof record !== 'object' ||
+    Array.isArray(record) ||
     record.id !== `${expected.name}@${expected.version}` ||
     record.name !== expected.name ||
     record.version !== expected.version ||
@@ -115,7 +122,7 @@ function runNpmCommand(args: string[]) {
   });
 }
 
-describe('npm 12 pack JSON', () => {
+describe('npm pack JSON', () => {
   const expected = { name: '@askrjs/monaco', version: '0.5.0' };
   const record = {
     id: '@askrjs/monaco@0.5.0',
@@ -125,14 +132,18 @@ describe('npm 12 pack JSON', () => {
     integrity: `sha512-${Buffer.alloc(64).toString('base64')}`,
     files: [{ path: 'package.json' }],
   };
-  it('accepts the single expected npm 12 keyed record', () => {
+  it('accepts a single npm 11 array record', () => {
+    expect(readPackResult(JSON.stringify([record]), expected)).toEqual(record);
+  });
+  it('accepts a single expected npm 12 keyed record', () => {
     expect(
       readPackResult(JSON.stringify({ [expected.name]: record }), expected)
     ).toEqual(record);
   });
   it.each([
     ['invalid JSON', '{'],
-    ['array instead of npm 12 keyed object', JSON.stringify([record])],
+    ['empty array', JSON.stringify([])],
+    ['multiple array records', JSON.stringify([record, record])],
     ['null result', 'null'],
     ['empty result', '{}'],
     ['wrong package key', JSON.stringify({ '@askrjs/other': record })],
