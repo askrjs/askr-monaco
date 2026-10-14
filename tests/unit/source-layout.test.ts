@@ -22,13 +22,13 @@ describe('Source layout', () => {
     ).toBe(true);
   });
 
-  it('should pin controlled lifecycle coverage to the affected Askr release', () => {
+  it('should pin controlled lifecycle coverage to the supported Askr floor', () => {
     const workflow = readFileSync(
       join(process.cwd(), '.github', 'workflows', 'ci.yml'),
       'utf8'
     );
 
-    expect(workflow).toContain("askr-version: ['0.2.0', latest]");
+    expect(workflow).toContain("askr-version: ['0.5.0', latest]");
     expect(workflow).toContain(
       'tests/browser/components/monaco-editor/integration.spec.ts'
     );

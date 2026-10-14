@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 - 2026-10-10
+
 ### Breaking changes
 
 - Export only `MonacoEditor`, `MonacoEditorProps`, and `MonacoEditorOptions` from
@@ -29,3 +31,8 @@
   unrelated updates cannot start duplicate loads.
 - Release a wrapper-owned model immediately when editor creation fails; preserve
   caller-owned models and allow recovery on a later update.
+
+### Development
+
+- First-party development workflows use Vite+; specialized compiler, runtime,
+  browser, and package checks remain part of validation.
