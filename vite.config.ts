@@ -30,6 +30,7 @@ export default defineConfig({
     unbundle: true,
     treeshake: false,
     deps: {
+      resolveDepSubpath: true,
       neverBundle: [/^@askrjs\/askr(?:\/.*)?$/],
     },
   },
