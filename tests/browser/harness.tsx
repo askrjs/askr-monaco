@@ -202,7 +202,7 @@ function createHarness() {
       );
       editor = await ready;
       driver = createMonacoEditorTestDriver(editor);
-      driver.replaceAll("SELECT 2;");
+      driver.replaceAll('SELECT 2;');
       return {
         hasHost: Boolean(container.querySelector('[data-askr-monaco-editor]')),
         value: editor.getValue(),

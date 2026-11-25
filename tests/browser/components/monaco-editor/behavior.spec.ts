@@ -23,7 +23,9 @@ test.describe('MonacoEditor - Behavior', () => {
   test('should load the package default Monaco module and apply an edit', async ({
     page,
   }) => {
-    const result = await page.evaluate(() => window.askrMonaco.defaultLoaderEdit());
+    const result = await page.evaluate(() =>
+      window.askrMonaco.defaultLoaderEdit()
+    );
     expect(result.hasHost).toBe(true);
     expect(result.value).toBe('SELECT 2;');
   });
