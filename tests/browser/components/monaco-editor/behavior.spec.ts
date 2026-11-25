@@ -20,6 +20,16 @@ test.describe('MonacoEditor - Behavior', () => {
     expect(result.createCalls).toBe(1);
   });
 
+  test('should load the package default Monaco module and apply an edit', async ({
+    page,
+  }) => {
+    const result = await page.evaluate(() =>
+      window.askrMonaco.defaultLoaderEdit()
+    );
+    expect(result.hasHost).toBe(true);
+    expect(result.value).toBe('SELECT 2;');
+  });
+
   test('should preserve focus when a model change updates controlled parent state', async ({
     page,
   }) => {

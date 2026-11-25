@@ -186,6 +186,29 @@ function createHarness() {
       };
     },
 
+    async defaultLoaderEdit() {
+      let resolveEditor!: (value: MonacoEditorInstance) => void;
+      const ready = new Promise<MonacoEditorInstance>((resolve) => {
+        resolveEditor = resolve;
+      });
+      container = mount(
+        <MonacoEditor
+          aria-label="Monaco editor default loader"
+          value="SELECT 1;"
+          language="sql"
+          options={editorOptions}
+          onMount={(mountedEditor) => resolveEditor(mountedEditor)}
+        />
+      );
+      editor = await ready;
+      driver = createMonacoEditorTestDriver(editor);
+      driver.replaceAll('SELECT 2;');
+      return {
+        hasHost: Boolean(container.querySelector('[data-askr-monaco-editor]')),
+        value: editor.getValue(),
+      };
+    },
+
     async focusPreservationSetup() {
       const fake = createFakeMonaco();
       fakeEditors = fake.editors;
