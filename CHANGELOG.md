@@ -2,10 +2,16 @@
 
 ## Unreleased
 
+## 0.5.1 - 2026-11-28
+
 ### Added
 
 - Export `@askrjs/monaco/explicit` for apps that supply their own Monaco
   namespace or loader and want to omit the default bundle.
+
+### Fixed
+
+- Register the JavaScript and TypeScript language definitions in the lazy-worker example.
 
 ## 0.5.0 - 2026-10-10
 
