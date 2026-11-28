@@ -5,12 +5,4 @@ export default defineConfig({
     jsx: 'automatic',
     jsxImportSource: '@askrjs/askr',
   },
-  resolve: {
-    alias: [
-      {
-        find: /^monaco-editor$/,
-        replacement: 'monaco-editor/editor/editor.api',
-      },
-    ],
-  },
 });

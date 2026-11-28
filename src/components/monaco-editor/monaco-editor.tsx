@@ -31,6 +31,7 @@ type MonacoController = {
   loadGeneration: number;
   loadingPromise: Promise<void> | null;
   loadingLoader: MonacoLoader;
+  fallbackLoader: NonNullable<MonacoLoader>;
   monacoSource: 'provided' | 'loaded' | null;
   lastHostRef: Ref<HTMLDivElement>;
   lastEditorRef: Ref<MonacoEditorInstance>;
@@ -42,11 +43,10 @@ type MonacoController = {
   lastTheme: string | undefined;
 };
 
-function defaultLoadMonaco() {
-  return import('monaco-editor');
-}
-
-function createController(initialProps: MonacoEditorProps): MonacoController {
+function createController(
+  initialProps: MonacoEditorProps,
+  fallbackLoader: NonNullable<MonacoLoader>
+): MonacoController {
   const controller: MonacoController = {
     host: null,
     editor: null,
@@ -75,6 +75,7 @@ function createController(initialProps: MonacoEditorProps): MonacoController {
     loadGeneration: 0,
     loadingPromise: null,
     loadingLoader: undefined,
+    fallbackLoader,
     monacoSource: null,
     lastHostRef: undefined,
     lastEditorRef: undefined,
@@ -465,7 +466,7 @@ function startLoadingMonaco(
   controller: MonacoController,
   loader: MonacoLoader
 ) {
-  const load = loader ?? defaultLoadMonaco;
+  const load = loader ?? controller.fallbackLoader;
 
   if (controller.loadingPromise && controller.loadingLoader === load) {
     return;
@@ -555,8 +556,11 @@ async function applyController(controller: MonacoController) {
  * Monaco wrapper that keeps the Askr surface thin and forwards real Monaco
  * models, options, and lifecycle access instead of recreating Monaco's API.
  */
-export function MonacoEditor(props: MonacoEditorProps): JSX.Element {
-  const controllerState = state(createController(props));
+export function renderMonacoEditor(
+  props: MonacoEditorProps,
+  fallbackLoader: NonNullable<MonacoLoader>
+): JSX.Element {
+  const controllerState = state(createController(props, fallbackLoader));
   const controller = controllerState();
   controller.currentProps = props;
   controller.disposed = false;

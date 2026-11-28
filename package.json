@@ -34,6 +34,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./explicit": {
+      "types": "./dist/explicit.d.ts",
+      "import": "./dist/explicit.js"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {

@@ -75,6 +75,22 @@ describe('Vite lazy worker example', () => {
     expect(dynamicMonaco).toBeDefined();
     expect(initialEntry!.dynamicImports).toContain(dynamicMonaco!.fileName);
     expect(dynamicMonaco!.code.length).toBeLessThanOrEqual(monacoEditorBudget);
+    const moduleIds = chunks.flatMap((chunk) => Object.keys(chunk.modules));
+    for (const language of ['javascript', 'typescript']) {
+      expect(
+        moduleIds.some((id) =>
+          id.endsWith(`/vs/languages/definitions/${language}/register.js`)
+        )
+      ).toBe(true);
+    }
+    expect(
+      moduleIds.some((id) => id.endsWith('/monaco-editor/esm/vs/index.js'))
+    ).toBe(false);
+    expect(
+      moduleIds.some((id) =>
+        id.endsWith('/vs/languages/definitions/python/register.js')
+      )
+    ).toBe(false);
   });
 
   it('should emit only the configured workers within their size budgets', () => {

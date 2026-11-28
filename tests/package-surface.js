@@ -12,7 +12,11 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
-assert.deepEqual(Object.keys(manifest.exports).sort(), ['.', './package.json']);
+assert.deepEqual(Object.keys(manifest.exports).sort(), [
+  '.',
+  './explicit',
+  './package.json',
+]);
 const npmCli = process.env.npm_execpath;
 assert.ok(npmCli, 'Run the packed consumer through npm run test:exports');
 const runNpm = (args, options) =>
@@ -52,12 +56,15 @@ try {
     `
 import assert from 'node:assert/strict';
 import * as wrapper from '@askrjs/monaco';
+import * as explicit from '@askrjs/monaco/explicit';
 import { renderToStringSync } from '@askrjs/askr/ssr';
 import manifest from '@askrjs/monaco/package.json' with { type: 'json' };
 assert.equal(manifest.name, '@askrjs/monaco');
-assert.deepEqual(Object.keys(wrapper), ['MonacoEditor']);
-const html = renderToStringSync(() => wrapper.MonacoEditor({ 'aria-label': 'Editor', loadMonaco: () => { throw new Error('SSR must not load Monaco'); } }));
-assert.ok(html.includes('data-askr-monaco-editor') && html.includes('aria-label="Editor"'));
+for (const entry of [wrapper, explicit]) {
+  assert.deepEqual(Object.keys(entry), ['MonacoEditor']);
+  const html = renderToStringSync(() => entry.MonacoEditor({ 'aria-label': 'Editor', loadMonaco: () => { throw new Error('SSR must not load Monaco'); } }));
+  assert.ok(html.includes('data-askr-monaco-editor') && html.includes('aria-label="Editor"'));
+}
 for (const path of ['monaco-editor', 'testing', 'dist/components/monaco-editor/monaco-editor.js']) {
   await assert.rejects(import('@askrjs/monaco/' + path), { code: 'ERR_PACKAGE_PATH_NOT_EXPORTED' });
 }
@@ -82,10 +89,16 @@ for (const path of ['monaco-editor', 'testing', 'dist/components/monaco-editor/m
     join(consumer, 'types.ts'),
     `
 import { MonacoEditor, type MonacoEditorProps, type MonacoEditorOptions } from '@askrjs/monaco';
+import { MonacoEditor as ExplicitEditor } from '@askrjs/monaco/explicit';
 import type * as Monaco from 'monaco-editor';
 const options: MonacoEditorOptions = { readOnly: true };
 const props: MonacoEditorProps = { options, editorRef: { current: null as Monaco.editor.IStandaloneCodeEditor | null }, loadMonaco: async () => await import('monaco-editor') };
 MonacoEditor(props);
+ExplicitEditor({ loadMonaco: async () => await import('monaco-editor') });
+declare const monaco: typeof Monaco;
+ExplicitEditor({ monaco });
+// @ts-expect-error the explicit entry requires a namespace or loader
+ExplicitEditor({ options });
 ${removed.map((name) => `// @ts-expect-error ${name} is private in 0.5\nimport type { ${name} } from '@askrjs/monaco';`).join('\n')}
 // @ts-expect-error test controls are private
 import { createMonacoEditorTestDriver } from '@askrjs/monaco';
