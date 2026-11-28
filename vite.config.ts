@@ -5,7 +5,10 @@ import { defineConfig } from 'vite-plus';
 
 const srcRoot = fileURLToPath(new URL('./src', import.meta.url));
 
-const packageEntries = { index: resolve(srcRoot, 'index.ts') };
+const packageEntries = {
+  index: resolve(srcRoot, 'index.ts'),
+  explicit: resolve(srcRoot, 'explicit.ts'),
+};
 
 export default defineConfig({
   fmt: {

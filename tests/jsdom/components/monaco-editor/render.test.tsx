@@ -7,6 +7,7 @@ import type {
 } from '../../../../src/components/monaco-editor/monaco-editor.types';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { MonacoEditor } from '../../../../src';
+import { MonacoEditor as ExplicitEditor } from '../../../../src/explicit';
 import { updateImperativeHost } from '../../../../src/components/monaco-editor/imperative-host';
 import { createFakeMonaco } from '../../../monaco-test-utils';
 import { mount, unmount } from '../../../test-utils';
@@ -56,6 +57,32 @@ describe('MonacoEditor - jsdom', () => {
     );
     expect(owner.host).toBe(replacement);
     expect(disposeForHostChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('should use the explicit loader and dispose its editor on unmount', async () => {
+    const fake = createFakeMonaco();
+    const loadMonaco = vi.fn(async () => fake.monaco);
+
+    container = mount(<ExplicitEditor loadMonaco={loadMonaco} />);
+    await flushUpdates();
+
+    expect(loadMonaco).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(fake.editors).toHaveLength(1));
+    unmount(container);
+    container = undefined;
+    expect(fake.editors[0].disposeCalls).toBe(1);
+  });
+
+  it('should report a missing explicit Monaco source through onError', async () => {
+    const onError = vi.fn();
+
+    // @ts-expect-error Exercise untyped consumers that omit the required source.
+    container = mount(<ExplicitEditor onError={onError} />);
+    await flushUpdates();
+
+    expect(onError).toHaveBeenCalledExactlyOnceWith(
+      new Error('@askrjs/monaco/explicit: pass monaco or loadMonaco.')
+    );
   });
 
   it('should create a Monaco editor with raw options and lifecycle hooks', async () => {

@@ -1,6 +1,6 @@
 import { createIsland } from '@askrjs/askr/boot';
 
-import { MonacoEditor } from '../../../src';
+import { MonacoEditor } from '../../../src/explicit';
 import { loadMonaco } from './load-monaco';
 import { configureMonacoWorkers } from './monaco-workers';
 

@@ -59,6 +59,13 @@ const model = monaco.editor.createModel(
   shared Monaco namespace, so simultaneous editors cannot display different
   themes; the most recently applied theme wins.
 
+## Smaller application bundles
+
+Import `MonacoEditor` from `@askrjs/monaco/explicit` and pass a modular
+`loadMonaco` function or a preloaded `monaco` namespace. The explicit entry
+lets bundlers omit the default Monaco import. See the
+[Vite worker and language setup](./docs/vite-lazy-workers.md).
+
 ## Layout
 
 - `src/components/monaco-editor` - public wrapper surface

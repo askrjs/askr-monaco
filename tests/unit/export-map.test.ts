@@ -14,7 +14,7 @@ function readPackageJson(): { exports: Record<string, ExportTarget | string> } {
 }
 
 describe('Package exports', () => {
-  it('should publish only the root and package metadata entrypoints', () => {
+  it('should publish the root, explicit loader, and package metadata entrypoints', () => {
     const packageJson = readPackageJson();
 
     expect(packageJson.exports['.']).toEqual({
@@ -24,9 +24,14 @@ describe('Package exports', () => {
 
     expect(Object.keys(packageJson.exports).sort()).toEqual([
       '.',
+      './explicit',
       './package.json',
     ]);
 
+    expect(packageJson.exports['./explicit']).toEqual({
+      types: './dist/explicit.d.ts',
+      import: './dist/explicit.js',
+    });
     expect(packageJson.exports['./package.json']).toBe('./package.json');
   });
 });

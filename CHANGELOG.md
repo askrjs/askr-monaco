@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Export `@askrjs/monaco/explicit` for apps that supply their own Monaco
+  namespace or loader and want to omit the default bundle.
+
 ## 0.5.0 - 2026-10-10
 
 ### Breaking changes
